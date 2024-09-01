@@ -7,11 +7,27 @@ specifies that any unauthenticated user can "create", "read", "update",
 and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-  Todo: a
+    QChatRequest: a
     .model({
-      content: a.string(),
+      customer: a.string().required(),
+      website: a.url().required(),
+      additional_sites: a.url().array(),
+      chatbotname: a.string(),
+      chatbot_logo_url: a.string(),
+      initial_text: a.string(),
+      guardrails: a.string(),
+      acceptTnC: a.boolean().required(),
+      docs: a.string().array(),
+      token: a.string(),
+      bot_status: a.enum(["Active", "Expired", "Disabled"]),
+      qchatform_status: a.enum(["Submitted", "Completed", "Error"]),
+      regionQ: a.enum(["NORTH_VIRGINIA", "OREGON"]),
+      expiry_datetime: a.datetime(),
+      requester_email: a.email(),
+      applicationIdQ: a.string(),
+      indexedPages: a.string(),
     })
-    .authorization((allow) => [allow.guest()]),
+    .authorization((allow) => [allow.authenticated()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -19,7 +35,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'iam',
+    defaultAuthorizationMode: 'userPool',
   },
 });
 

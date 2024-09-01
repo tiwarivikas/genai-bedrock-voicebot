@@ -1,0 +1,15 @@
+Write a Javascript Lambda function to perform following functions:
+1. Get the "user query" parameter from input payload
+2. Get the Kendra index and filter options from input payload
+3. Call Kendra Query API to get the results from the Kendra index based on given filters to retrieve results only from FAQs. 
+4. Call Kendra Retrieve API to get the Top 10 results 
+5. Generate a prompt for Bedrock API to answer the "user query" from the search results received. Priority should be given to the FAQ results. Also, ask model to return the url of search result used to generate response.
+6. Call the Bedrock API with Claude 3 model endpoint to get the results within 2 lines. 
+7. Return the response from Lambda function. 
+
+
+
+
+Write Typescript CDK code to perform following functions:
+1. Create DynamoDB table with conversation-id as partition key and date as sortkey
+2. Create lambda function to provide functions to create and retrieve conversations. 

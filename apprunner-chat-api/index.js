@@ -3,15 +3,7 @@ const cors = require('cors');
 const express = require('express');
 
 const {chat} = require('./components/chat-service');
-const {authenticateJWT} = require('./components/auth-service');
-const { speechSynthesizeTTS } = require("./components/bhashini/bhashini-tts");
-const {
-  textToSpeechStream,
-} = require("./components/aws-polly-translate/tts-polly");
-
-const {
-  bhashiniTranslation,
-} = require("./components/bhashini/bhashini-translation");
+const { authenticateJWT } = require("./components/auth-service");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,26 +36,6 @@ app.get("/stream", authenticateJWT, async (req, res) => {
     isSpeakerEnabled,
     translationLanguage
   );
-
-  // Clean up when client closes connection
-  req.on("close", () => {
-    res.end();
-  });
-});
-
-app.get("/test", async (req, res) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-
-  const response = await bhashiniTranslation("How are you?", "en", "mr");
-  console.log(response);
-  const respAudio = await textToSpeechStream(response, res, "mr");
-  console.log("getting first Audio ");
-  //const firstAudioByte = respAudio[0].audioContent;
-  //console.log(firstAudioByte);
-
-  //res.status(200).send(response);
 
   // Clean up when client closes connection
   req.on("close", () => {
