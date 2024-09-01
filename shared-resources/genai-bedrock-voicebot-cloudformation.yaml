@@ -1,32 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template to create two Amplify projects where the API URL from the first project is used in the second project.
+Description: CloudFormation template to create Amplify and AppRunner projects within a monorepo.
 
 Parameters:
-  ProjectName:
-    Description: The name of the first Amplify project.
-    Type: String
-    Default: GenAI-Bedrock-Voicebot
-
-  SecondProjectName:
-    Description: The name of the second Amplify project.
-    Type: String
-    Default: GenAI-Bedrock-Voicebot-ChatUI
-
-  Environment:
-    Description: The environment (e.g., production, staging).
-    Type: String
-    Default: production
-
-  SecretKey:
-    Description: The secret key to be used as an environment variable.
-    Type: String
-
-  GitHubOwner:
-    Description: The GitHub repository owner.
-    Type: String
-
-  GitHubRepo:
-    Description: The GitHub repository name.
+  GitHubBaseURL:
+    Description: The base URL of the GitHub repository, including the branch and folder paths.
     Type: String
 
   GitHubToken:
@@ -34,12 +11,16 @@ Parameters:
     Type: String
     NoEcho: true
 
-  GitHubBranch:
-    Description: The GitHub branch to deploy (e.g., main, master).
+  ProjectName:
+    Description: The name of the first Amplify project (e.g., amplify-chat-admin).
     Type: String
 
-  AWSRegion:
-    Description: The AWS region where resources will be created.
+  SecondProjectName:
+    Description: The name of the second Amplify project (e.g., amplify-chat-ui).
+    Type: String
+
+  Environment:
+    Description: The environment (e.g., production, staging).
     Type: String
 
   JWTSecret:
@@ -49,161 +30,137 @@ Parameters:
   KendraIndexId:
     Description: The ID of the Kendra Index.
     Type: String
-    Default: your-kendra-index-id
 
   ChatProdApi:
     Description: The API endpoint for the chat production environment.
     Type: String
-    Default: https://chat.example.com/api
+
+  BHASHINI_USER_ID:
+    Description: Optional Bhashini User ID for integration.
+    Type: String
+    Default: ""
+
+  BHASHINI_API_KEY:
+    Description: Optional Bhashini API Key for integration.
+    Type: String
+    Default: ""
 
 Resources:
-  ApiUrlParameter:
+  # Extract components from the GitHubBaseURL
+  GitHubUser:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ProjectName}/${Environment}/api_url"
+      Name: !Sub "/${AWS::StackName}/GitHubUser"
       Type: String
-      Value: !GetAtt AmplifyApp1.DefaultDomain
+      Value: !Select [3, !Split ["/", !Sub "${GitHubBaseURL}"]]
 
-  SecretKeyParameter:
+  GitHubRepo:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ProjectName}/${Environment}/secret_key"
+      Name: !Sub "/${AWS::StackName}/GitHubRepo"
       Type: String
-      Value: !Ref SecretKey
+      Value: !Select [4, !Split ["/", !Sub "${GitHubBaseURL}"]]
 
-  JWTSecretParameter:
+  GitHubBranch:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ProjectName}/${Environment}/jwt_secret"
+      Name: !Sub "/${AWS::StackName}/GitHubBranch"
       Type: String
-      Value: !Ref JWTSecret
-
-  KendraIndexIdParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ProjectName}/${Environment}/kendra_indexid"
-      Type: String
-      Value: !Ref KendraIndexId
-
-  ChatProdApiParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ProjectName}/${Environment}/chat_prod_api"
-      Type: String
-      Value: !Ref ChatProdApi
+      Value: !Select [5, !Split ["/", !Sub "${GitHubBaseURL}"]]
 
   AmplifyApp1:
     Type: AWS::Amplify::App
     Properties:
       Name: !Ref ProjectName
       Description: !Sub "Amplify project for ${ProjectName} in ${Environment} environment"
-      EnvironmentVariables:
-        - Name: SECRET_KEY
-          Value: !Ref SecretKeyParameter
-        - Name: JWT_SECRET
-          Value: !Ref JWTSecretParameter
-        - Name: KENDRA_INDEXID
-          Value: !Ref KendraIndexIdParameter
-        - Name: CHAT_PROD_API
-          Value: !Ref ChatProdApiParameter
       OauthToken: !Ref GitHubToken
-      Repository: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
+      Repository: !Sub "https://github.com/${GitHubUser}/${GitHubRepo}"
       BranchName: !Ref GitHubBranch
+      EnvironmentVariables:
+        - Name: ENVIRONMENT
+          Value: !Ref Environment
+        - Name: JWT_SECRET
+          Value: !Ref JWTSecret
+        - Name: KENDRA_INDEXID
+          Value: !Ref KendraIndexId
+        - Name: CHAT_PROD_API
+          Value: !Ref ChatProdApi
+        - Name: BHASHINI_USER_ID
+          Value: !Ref BHASHINI_USER_ID
+        - Name: BHASHINI_API_KEY
+          Value: !Ref BHASHINI_API_KEY
+      SourceCodeUrl: !Sub "https://github.com/${GitHubUser}/${GitHubRepo}/tree/${GitHubBranch}/amplify-chat-admin"
       BuildSpec: |
-        version: 1
-        applications:
-          - frontend:
-              phases:
-                preBuild:
-                  commands:
-                    - npm ci
-                build:
-                  commands:
-                    - npm run build
-              artifacts:
-                baseDirectory: build
-                files:
-                  - '**/*'
-              cache:
-                paths:
-                  - node_modules/**/*
-    Outputs:
-      ApiUrl:
-        Description: The API URL of the first Amplify app.
-        Value: !Sub "https://${AmplifyApp1.DefaultDomain}"
+        version: 1.0
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - echo Installing dependencies...
+                - npm install
+            build:
+              commands:
+                - echo Building the project...
+                - npm run build
+          artifacts:
+            baseDirectory: /build
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/*
 
   AmplifyApp2:
     Type: AWS::Amplify::App
     Properties:
       Name: !Ref SecondProjectName
       Description: !Sub "Second Amplify project for ${SecondProjectName} in ${Environment} environment"
-      EnvironmentVariables:
-        - Name: API_URL
-          Value: !GetAtt AmplifyApp1.Outputs.ApiUrl
-        - Name: SECRET_KEY
-          Value: !Ref SecretKeyParameter
-        - Name: JWT_SECRET
-          Value: !Ref JWTSecretParameter
-        - Name: KENDRA_INDEXID
-          Value: !Ref KendraIndexIdParameter
-        - Name: CHAT_PROD_API
-          Value: !Ref ChatProdApiParameter
       OauthToken: !Ref GitHubToken
-      Repository: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
+      Repository: !Sub "https://github.com/${GitHubUser}/${GitHubRepo}"
       BranchName: !Ref GitHubBranch
+      EnvironmentVariables:
+        - Name: ENVIRONMENT
+          Value: !Ref Environment
+        - Name: APPRUNNER_API_URL
+          Value: !GetAtt AppRunnerService.ServiceUrl
+      SourceCodeUrl: !Sub "https://github.com/${GitHubUser}/${GitHubRepo}/tree/${GitHubBranch}/amplify-chat-ui"
       BuildSpec: |
-        version: 1
-        applications:
-          - frontend:
-              phases:
-                preBuild:
-                  commands:
-                    - npm ci
-                build:
-                  commands:
-                    - npm run build
-              artifacts:
-                baseDirectory: build
-                files:
-                  - '**/*'
-              cache:
-                paths:
-                  - node_modules/**/*
-
-  AmplifyAppSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Sub "${ProjectName}/${Environment}/secrets"
-      SecretString: !Sub |
-        {
-          "API_URL": "${ApiUrlParameter}",
-          "SECRET_KEY": "${SecretKey}",
-          "JWT_SECRET": "${JWTSecret}",
-          "KENDRA_INDEXID": "${KendraIndexId}",
-          "CHAT_PROD_API": "${ChatProdApi}"
-        }
+        version: 1.0
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - echo Installing dependencies...
+                - npm install
+            build:
+              commands:
+                - echo Building the project...
+                - npm run build
+          artifacts:
+            baseDirectory: /build
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/*
 
 Outputs:
-  AmplifyAppId1:
-    Description: The Amplify App ID for the first project.
-    Value: !GetAtt AmplifyApp1.AppId
+  GitHubUser:
+    Description: Extracted GitHub username from the base URL
+    Value: !Ref GitHubUser
 
-  AmplifyAppArn1:
-    Description: The ARN of the Amplify App for the first project.
-    Value: !GetAtt AmplifyApp1.Arn
+  GitHubRepo:
+    Description: Extracted GitHub repository name from the base URL
+    Value: !Ref GitHubRepo
+
+  GitHubBranch:
+    Description: Extracted GitHub branch name from the base URL
+    Value: !Ref GitHubBranch
 
   AmplifyAppUrl1:
     Description: The URL of the Amplify App for the first project.
-    Value: !Sub "https://${AmplifyAppId1}.amplifyapp.com"
-
-  AmplifyAppId2:
-    Description: The Amplify App ID for the second project.
-    Value: !GetAtt AmplifyApp2.AppId
-
-  AmplifyAppArn2:
-    Description: The ARN of the Amplify App for the second project.
-    Value: !GetAtt AmplifyApp2.Arn
+    Value: !Sub "https://${AmplifyApp1.DefaultDomain}"
 
   AmplifyAppUrl2:
     Description: The URL of the Amplify App for the second project.
-    Value: !Sub "https://${AmplifyAppId2}.amplifyapp.com"
+    Value: !Sub "https://${AmplifyApp2.DefaultDomain}"
