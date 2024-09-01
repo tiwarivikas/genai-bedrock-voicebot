@@ -1,0 +1,209 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create two Amplify projects where the API URL from the first project is used in the second project.
+
+Parameters:
+  ProjectName:
+    Description: The name of the first Amplify project.
+    Type: String
+    Default: GenAI-Bedrock-Voicebot
+
+  SecondProjectName:
+    Description: The name of the second Amplify project.
+    Type: String
+    Default: GenAI-Bedrock-Voicebot-ChatUI
+
+  Environment:
+    Description: The environment (e.g., production, staging).
+    Type: String
+    Default: production
+
+  SecretKey:
+    Description: The secret key to be used as an environment variable.
+    Type: String
+
+  GitHubOwner:
+    Description: The GitHub repository owner.
+    Type: String
+
+  GitHubRepo:
+    Description: The GitHub repository name.
+    Type: String
+
+  GitHubToken:
+    Description: The GitHub OAuth token for accessing the repository.
+    Type: String
+    NoEcho: true
+
+  GitHubBranch:
+    Description: The GitHub branch to deploy (e.g., main, master).
+    Type: String
+
+  AWSRegion:
+    Description: The AWS region where resources will be created.
+    Type: String
+
+  JWTSecret:
+    Description: The JWT secret to be used for authentication.
+    Type: String
+
+  KendraIndexId:
+    Description: The ID of the Kendra Index.
+    Type: String
+    Default: your-kendra-index-id
+
+  ChatProdApi:
+    Description: The API endpoint for the chat production environment.
+    Type: String
+    Default: https://chat.example.com/api
+
+Resources:
+  ApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/${Environment}/api_url"
+      Type: String
+      Value: !GetAtt AmplifyApp1.DefaultDomain
+
+  SecretKeyParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/${Environment}/secret_key"
+      Type: String
+      Value: !Ref SecretKey
+
+  JWTSecretParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/${Environment}/jwt_secret"
+      Type: String
+      Value: !Ref JWTSecret
+
+  KendraIndexIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/${Environment}/kendra_indexid"
+      Type: String
+      Value: !Ref KendraIndexId
+
+  ChatProdApiParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ProjectName}/${Environment}/chat_prod_api"
+      Type: String
+      Value: !Ref ChatProdApi
+
+  AmplifyApp1:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: !Ref ProjectName
+      Description: !Sub "Amplify project for ${ProjectName} in ${Environment} environment"
+      EnvironmentVariables:
+        - Name: SECRET_KEY
+          Value: !Ref SecretKeyParameter
+        - Name: JWT_SECRET
+          Value: !Ref JWTSecretParameter
+        - Name: KENDRA_INDEXID
+          Value: !Ref KendraIndexIdParameter
+        - Name: CHAT_PROD_API
+          Value: !Ref ChatProdApiParameter
+      OauthToken: !Ref GitHubToken
+      Repository: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
+      BranchName: !Ref GitHubBranch
+      BuildSpec: |
+        version: 1
+        applications:
+          - frontend:
+              phases:
+                preBuild:
+                  commands:
+                    - npm ci
+                build:
+                  commands:
+                    - npm run build
+              artifacts:
+                baseDirectory: build
+                files:
+                  - '**/*'
+              cache:
+                paths:
+                  - node_modules/**/*
+    Outputs:
+      ApiUrl:
+        Description: The API URL of the first Amplify app.
+        Value: !Sub "https://${AmplifyApp1.DefaultDomain}"
+
+  AmplifyApp2:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: !Ref SecondProjectName
+      Description: !Sub "Second Amplify project for ${SecondProjectName} in ${Environment} environment"
+      EnvironmentVariables:
+        - Name: API_URL
+          Value: !GetAtt AmplifyApp1.Outputs.ApiUrl
+        - Name: SECRET_KEY
+          Value: !Ref SecretKeyParameter
+        - Name: JWT_SECRET
+          Value: !Ref JWTSecretParameter
+        - Name: KENDRA_INDEXID
+          Value: !Ref KendraIndexIdParameter
+        - Name: CHAT_PROD_API
+          Value: !Ref ChatProdApiParameter
+      OauthToken: !Ref GitHubToken
+      Repository: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
+      BranchName: !Ref GitHubBranch
+      BuildSpec: |
+        version: 1
+        applications:
+          - frontend:
+              phases:
+                preBuild:
+                  commands:
+                    - npm ci
+                build:
+                  commands:
+                    - npm run build
+              artifacts:
+                baseDirectory: build
+                files:
+                  - '**/*'
+              cache:
+                paths:
+                  - node_modules/**/*
+
+  AmplifyAppSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${ProjectName}/${Environment}/secrets"
+      SecretString: !Sub |
+        {
+          "API_URL": "${ApiUrlParameter}",
+          "SECRET_KEY": "${SecretKey}",
+          "JWT_SECRET": "${JWTSecret}",
+          "KENDRA_INDEXID": "${KendraIndexId}",
+          "CHAT_PROD_API": "${ChatProdApi}"
+        }
+
+Outputs:
+  AmplifyAppId1:
+    Description: The Amplify App ID for the first project.
+    Value: !GetAtt AmplifyApp1.AppId
+
+  AmplifyAppArn1:
+    Description: The ARN of the Amplify App for the first project.
+    Value: !GetAtt AmplifyApp1.Arn
+
+  AmplifyAppUrl1:
+    Description: The URL of the Amplify App for the first project.
+    Value: !Sub "https://${AmplifyAppId1}.amplifyapp.com"
+
+  AmplifyAppId2:
+    Description: The Amplify App ID for the second project.
+    Value: !GetAtt AmplifyApp2.AppId
+
+  AmplifyAppArn2:
+    Description: The ARN of the Amplify App for the second project.
+    Value: !GetAtt AmplifyApp2.Arn
+
+  AmplifyAppUrl2:
+    Description: The URL of the Amplify App for the second project.
+    Value: !Sub "https://${AmplifyAppId2}.amplifyapp.com"
