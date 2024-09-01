@@ -23,7 +23,6 @@ const _config: AppConfig = {
     CHAT_PROD_API: process.env.CHAT_PROD_API || '',
 };
 
-console.log("config", _config);
 
 // Export the configuration
 export default _config;

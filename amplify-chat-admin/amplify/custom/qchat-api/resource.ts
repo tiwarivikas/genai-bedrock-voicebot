@@ -26,8 +26,6 @@ export class QChatApi extends Construct {
   constructor(scope: Construct, id: string, props: QChatApiProps) {
     super(scope, id);
 
-    console.log("config:: ", process.env.JWT_SECRET);
-
     const cognito_user_pool = props.cognito_user_pool;
     const appSync_url = props.appSync_url;
 
@@ -402,6 +400,7 @@ export class QChatApi extends Construct {
 
     // Define the App Runner service
     const appRunnerService = new apprunner.CfnService(this, 'AppRunnerService', {
+
       sourceConfiguration: {
         authenticationConfiguration: {
           connectionArn: _config.APPRUNNER_GITHUB_CONNECTION_ARN,
@@ -439,7 +438,11 @@ export class QChatApi extends Construct {
                 {
                   name: "KENDRA_INDEXID",
                   value: _config.KENDRA_INDEXID
-                }
+                },
+                {
+                  name: "TEST",
+                  value: "TEST"
+                },
               ]
             },
           },
@@ -448,6 +451,6 @@ export class QChatApi extends Construct {
       instanceConfiguration: {
         instanceRoleArn: appRunnerRole.roleArn,
       }
-    });
+    }); 
   }
 }
