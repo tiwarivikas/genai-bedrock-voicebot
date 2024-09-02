@@ -15,9 +15,3 @@ BHASHINI_API_KEY="<API Key of Bhashini>"
 VITE_APIGW_ENDPOINT: <HTTP API Gateway URL>
 VITE_STREAMING_API_ENDPOINT: <AppRunner URL>
 
-
-# Update the Build settings in Amplify Console for the "amplify-chat-ui" to include the following echo commands before running npm run build:
-          commands:
-            - echo "VITE_APIGW_ENDPOINT=$VITE_APP_APIGW_ENDPOINT" >> .env
-            - echo "VITE_STREAMING_API_ENDPOINT=$VITE_APP_STREAMING_API_ENDPOINT" >> .env
-            - npm run build
