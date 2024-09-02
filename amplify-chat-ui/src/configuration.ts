@@ -31,7 +31,3 @@ export const defaultQchatConfiguration: QchatConfiguration = {
   streamGetAnswer: true,
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
 }
-
-console.log("NEXT_PUBLIC_APIGW_ENDPOINT:", import.meta.env.VITE_APIGW_ENDPOINT);
-console.log("NEXT_PUBLIC_STREAMING_API_ENDPOINT: ", import.meta.env.VITE_STREAMING_API_ENDPOINT);
-//console.log("import.meta.env: " + import.meta.env.MODE);
