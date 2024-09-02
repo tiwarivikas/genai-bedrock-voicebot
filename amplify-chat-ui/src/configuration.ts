@@ -32,5 +32,5 @@ export const defaultQchatConfiguration: QchatConfiguration = {
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
 }
 
-console.log("REACT_APP_APIGW_ENDPOINT", process.env.REACT_APP_APIGW_ENDPOINT);
-console.log("REACT_APP_STREAMING_API_ENDPOINT", process.env.REACT_APP_STREAMING_API_ENDPOINT);
+console.log("REACT_APP_APIGW_ENDPOINT: ", process.env.REACT_APP_APIGW_ENDPOINT);
+console.log("REACT_APP_STREAMING_API_ENDPOINT: ", process.env.REACT_APP_STREAMING_API_ENDPOINT);
