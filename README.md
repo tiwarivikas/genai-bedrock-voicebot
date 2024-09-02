@@ -12,5 +12,5 @@ BHASHINI_USER_ID="<User ID of Bhashini>"
 BHASHINI_API_KEY="<API Key of Bhashini>"
 
 Configure following environment variables in Amplify Console for the "amplify-chat-ui": 
-apiGatewayEndpoint: <HTTP API Gateway URL>
-streamingAPIEndpoint: <AppRunner URL>
+REACT_APP_APIGW_ENDPOINT: <HTTP API Gateway URL>
+REACT_APP_STREAMING_API_ENDPOINT: <AppRunner URL>

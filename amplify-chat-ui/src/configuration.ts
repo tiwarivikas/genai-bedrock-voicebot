@@ -25,8 +25,8 @@ export const defaultConfiguration: Configuration = {
 export const defaultQchatConfiguration: QchatConfiguration = {
   token:
     "",
-  apiUrl: process.env.apiGatewayEndpoint || '', //Used for Like/Dislike API calls
-  apiStreamingUrl: process.env.streamingAPIEndpoint || '' , //Used for Streaming Chat Response (default)
+  apiUrl: process.env.REACT_APP_APIGW_ENDPOINT || '', //Used for Like/Dislike API calls
+  apiStreamingUrl: process.env.REACT_APP_STREAMING_API_ENDPOINT || '' , //Used for Streaming Chat Response (default)
   apiVersion: "v2",
   streamGetAnswer: true,
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
