@@ -25,12 +25,12 @@ export const defaultConfiguration: Configuration = {
 export const defaultQchatConfiguration: QchatConfiguration = {
   token:
     "",
-  apiUrl: process.env.REACT_APP_APIGW_ENDPOINT || '', //Used for Like/Dislike API calls
-  apiStreamingUrl: process.env.REACT_APP_STREAMING_API_ENDPOINT || '' , //Used for Streaming Chat Response (default)
+  apiUrl: process.env.NEXT_PUBLIC_APIGW_ENDPOINT || '', //Used for Like/Dislike API calls
+  apiStreamingUrl: process.env.NEXT_PUBLIC_STREAMING_API_ENDPOINT || '' , //Used for Streaming Chat Response (default)
   apiVersion: "v2",
   streamGetAnswer: true,
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
 }
 
-console.log("REACT_APP_APIGW_ENDPOINT: ", process.env.REACT_APP_APIGW_ENDPOINT);
-console.log("REACT_APP_STREAMING_API_ENDPOINT: ", process.env.REACT_APP_STREAMING_API_ENDPOINT);
+console.log("NEXT_PUBLIC_APIGW_ENDPOINT: ", process.env.NEXT_PUBLIC_APIGW_ENDPOINT);
+console.log("NEXT_PUBLIC_STREAMING_API_ENDPOINT: ", process.env.NEXT_PUBLIC_STREAMING_API_ENDPOINT);
