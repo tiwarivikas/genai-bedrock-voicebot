@@ -1,7 +1,7 @@
 # genai-bedrock-voicebot
 This Codebase allows creation of Multi-tenant GenAI based Chat and Voicebots
 
-Configure following environment variables in Amplify Console for the "amplify-chat-admin": 
+# Configure following environment variables in Amplify Console for the "amplify-chat-admin": 
 JWT_SECRET='<Specify a random string>'
 APPRUNNER_GITHUB_URL='<Github URL>'
 APPRUNNER_GITHUB_BRANCH_MAIN='<Branch Name>' //Default is 'main'
@@ -11,6 +11,13 @@ CHAT_PROD_API="<URL of the Amplify Chat UI project>" // To be configured later a
 BHASHINI_USER_ID="<User ID of Bhashini>"
 BHASHINI_API_KEY="<API Key of Bhashini>"
 
-Configure following environment variables in Amplify Console for the "amplify-chat-ui": 
+# Configure following environment variables in Amplify Console for the "amplify-chat-ui": 
 REACT_APP_APIGW_ENDPOINT: <HTTP API Gateway URL>
 REACT_APP_STREAMING_API_ENDPOINT: <AppRunner URL>
+
+
+# Update the Build settings in Amplify Console for the "amplify-chat-ui" to include the following echo commands before running npm run build:
+          commands:
+            - echo "REACT_APP_APIGW_ENDPOINT=$REACT_APP_APIGW_ENDPOINT" >> .env
+            - echo "REACT_APP_STREAMING_API_ENDPOINT=$REACT_APP_STREAMING_API_ENDPOINT" >> .env
+            - npm run build
