@@ -5,6 +5,7 @@ import * as url from "node:url";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
 import * as iam from "aws-cdk-lib/aws-iam";
+import * as kendra from 'aws-cdk-lib/aws-kendra';
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb"
@@ -111,7 +112,7 @@ export class QChatApi extends Construct {
     lambdaCreateQAppRole.addToPolicy(
       new iam.PolicyStatement({
         resources: ["*"],
-        actions: ["logs:*", "qbusiness:*", "iam:PassRole", "dynamodb:*", "kendra:*"],
+        actions: ["logs:*", "iam:PassRole", "dynamodb:*", "kendra:*"],
         effect: iam.Effect.ALLOW,
       }),
     );
@@ -150,8 +151,116 @@ export class QChatApi extends Construct {
     // Define API Gateway resource
     const apiResource = api.root.addResource("createApp");
 
+
     // ****************************************************************
-    // ***** LAMBDA: Execute Commands - Refresh Token, Delete Q App ***
+    // ************ Create Kendra Index *******************************
+    // ****************************************************************
+    // Create the Kendra Index IAM Role
+    const kendraRole = new iam.Role(this, 'KendraIndexRole', {
+      assumedBy: new iam.ServicePrincipal('kendra.amazonaws.com'),
+      description: 'IAM Role for Kendra Index',
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonKendraFullAccess'),
+      ],
+    });
+    // Create the Kendra Index
+    const kendraIndex = new kendra.CfnIndex(this, 'MyKendraIndex', {
+      name: 'GenAIBedrockVoiceBotKendraIndex',
+      edition: 'ENTERPRISE_EDITION',
+      roleArn: kendraRole.roleArn,
+      description: 'An Enterprise Edition Kendra index for searching documents',
+    });
+    const region = cdk.Stack.of(this).region;
+    const account = cdk.Stack.of(this).account;
+
+    // Create the Kendra Data Source IAM Role
+    const kendraDataSourceRole = new iam.Role(this, 'KendraDataSourceRole', {
+      assumedBy: new iam.ServicePrincipal('kendra.amazonaws.com'), // Trust relationship
+      description: 'IAM Role for Kendra Data Source (Web Crawler)',
+    });
+
+    // Attach custom policies to the Kendra Data Source Role
+
+    // Kendra Principal Mapping actions
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'kendra:PutPrincipalMapping',
+        'kendra:DeletePrincipalMapping',
+        'kendra:ListGroupsOlderThanOrderingId',
+        'kendra:DescribePrincipalMapping',
+      ],
+      resources: [
+        `arn:aws:kendra:${region}:${account}:index/*`,
+        `arn:aws:kendra:${region}:${account}:index/*/data-source/*`,
+      ],
+    }));
+
+    // Kendra Document actions
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'kendra:BatchPutDocument',
+        'kendra:BatchDeleteDocument',
+      ],
+      resources: [`arn:aws:kendra:${region}:${account}:index/*`],
+    }));
+
+    // EC2 Network Interface conditional access
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['ec2:CreateNetworkInterface'],
+      resources: [`arn:aws:ec2:${region}:${account}:network-interface/*`],
+      conditions: {
+        'StringLike': {
+          'aws:RequestTag/AWS_KENDRA': `kendra_${account}_*`,
+        },
+      },
+    }));
+
+    // EC2 CreateTags action
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['ec2:CreateTags'],
+      resources: [`arn:aws:ec2:${region}:${account}:network-interface/*`],
+      conditions: {
+        'StringEquals': {
+          'ec2:CreateAction': 'CreateNetworkInterface',
+        },
+      },
+    }));
+
+    // EC2 Network Interface Permission access
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['ec2:CreateNetworkInterfacePermission'],
+      resources: [`arn:aws:ec2:${region}:${account}:network-interface/*`],
+      conditions: {
+        'StringLike': {
+          'aws:ResourceTag/AWS_KENDRA': `kendra_${account}_*`,
+        },
+      },
+    }));
+
+    // Describe EC2 resources access
+    kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ec2:DescribeNetworkInterfaces',
+        'ec2:DescribeAvailabilityZones',
+        'ec2:DescribeNetworkInterfaceAttribute',
+        'ec2:DescribeVpcs',
+        'ec2:DescribeRegions',
+        'ec2:DescribeNetworkInterfacePermissions',
+        'ec2:DescribeSubnets',
+      ],
+      resources: ['*'],
+    }));
+    
+
+
+    // ****************************************************************
+    // ***** LAMBDA: Execute Commands - Refresh Token, Delete App ***
     // *****  Index status, Bedrock chat - List Conversation  *********
     // ****************************************************************
     const executeCommandLambda = new lambda.NodejsFunction(
@@ -164,7 +273,7 @@ export class QChatApi extends Construct {
         runtime: Runtime.NODEJS_18_X,
         role: lambdaCreateQAppRole,
         timeout: Duration.minutes(1),
-        environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, DDBTable_ConversationsList: conversationListTable.tableName, conversationDDBTableName: conversationTable.tableName, KENDRA_INDEXID: _config.KENDRA_INDEXID, CHAT_PROD_API: _config.CHAT_PROD_API },
+        environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, DDBTable_ConversationsList: conversationListTable.tableName, conversationDDBTableName: conversationTable.tableName, KENDRA_INDEXID: kendraIndex.attrId, CHAT_PROD_API: _config.CHAT_PROD_API },
       },
     );
 
@@ -210,7 +319,7 @@ export class QChatApi extends Construct {
         new URL("handlers/chatBRResponseAPIHandler.ts", import.meta.url),
       ),
       runtime: Runtime.NODEJS_18_X,
-      environment: { JWT_SECRET: _config.JWT_SECRET, conversationDDBTableName: conversationTable.tableName, DDBTable_ConversationSummary: conversationListTable.tableName, KENDRA_INDEXID: _config.KENDRA_INDEXID },
+      environment: { JWT_SECRET: _config.JWT_SECRET, conversationDDBTableName: conversationTable.tableName, DDBTable_ConversationSummary: conversationListTable.tableName, KENDRA_INDEXID: kendraIndex.attrId },
       role: lambdachatBRrole,
       timeout: Duration.minutes(5),
     });
@@ -347,7 +456,7 @@ export class QChatApi extends Construct {
       runtime: Runtime.NODEJS_18_X,
       role: lambdaCreateBRAppRole,
       timeout: Duration.minutes(5),
-      environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, API_Endpoint: httpApi.apiEndpoint, CHAT_PROD_API: _config.CHAT_PROD_API, KENDRA_INDEXID: _config.KENDRA_INDEXID },
+      environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, API_Endpoint: httpApi.apiEndpoint, CHAT_PROD_API: _config.CHAT_PROD_API, KENDRA_INDEXID: kendraIndex.attrId, KENDRA_DATASOURCE_ROLE: kendraDataSourceRole.roleArn },
     });
 
     // Define API Gateway resource
@@ -437,7 +546,7 @@ export class QChatApi extends Construct {
                 },
                 {
                   name: "KENDRA_INDEXID",
-                  value: _config.KENDRA_INDEXID
+                  value: kendraIndex.attrId
                 },
                 {
                   name: "TEST",

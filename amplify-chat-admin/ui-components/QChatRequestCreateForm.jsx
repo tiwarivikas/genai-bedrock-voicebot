@@ -194,7 +194,7 @@ export default function QChatRequestCreateForm(props) {
     initial_text: "",
     guardrails: "",
     acceptTnC: false,
-    regionQ: "NORTH_VIRGINIA",
+    regionQ: "ap-south-1",
   };
   const [customer, setCustomer] = React.useState(initialValues.customer);
   const [website, setWebsite] = React.useState(initialValues.website);

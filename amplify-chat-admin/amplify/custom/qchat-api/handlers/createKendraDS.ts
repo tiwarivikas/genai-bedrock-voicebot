@@ -151,7 +151,7 @@ export const handler = async function (
             "IndexId": indexId,
             "Name": "ds-" + inputVars.customer,
             "LanguageCode": "en",
-            "RoleArn": "arn:aws:iam::717937492408:role/service-role/AmazonKendra-qchat-ds",
+            "RoleArn": process.env.KENDRA_DATASOURCE_ROLE,
             "Schedule": `cron(${minutes} ${hours} ? * ${day} *)`,
             "Type": "TEMPLATE",
             /* "ClientToken": "57ae8abf-0345-447c-a27f-761ad36a92f2" */
@@ -173,14 +173,15 @@ export const handler = async function (
         //Write to URL Shortener
         let urlShortenerResult = ""
         let publicURL = ""
-        const redirectURL = process.env.CHAT_PROD_API + token
+        const redirectURL = process.env.CHAT_PROD_API + "?bedrockEngine=true&token=" + token
         if (dsId) {
             urlShortenerResult = await urlShortenerDDB(dsId, redirectURL)
         }
 
         if (urlShortenerResult) {
-            //https://o5sib7u8b8.execute-api.ap-south-1.amazonaws.com/v2/tiny?id=4bcbe3a7-c45b-4811-8db5-1b739f2f271d
             publicURL = process.env.API_Endpoint + "/v2/tiny?id=" + dsId
+        } else {
+            publicURL = ""
         }
 
         //Send final response with Q Application ID

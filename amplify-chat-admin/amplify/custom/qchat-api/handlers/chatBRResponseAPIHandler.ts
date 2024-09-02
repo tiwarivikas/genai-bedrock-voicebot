@@ -117,11 +117,7 @@ async function chat(userMsg: string, decodedToken: any) {
   let nextQuery = '';
 
   try {
-    if (decodedToken.regionQ === "OREGON") {
-      region = "us-west-2";
-    } else {
-      region = "us-east-1";
-    }
+    region = "ap-south-1";
     const msg = JSON.parse(userMsg);
     const query = msg.userMessage;
     conversationId = msg.conversationId;

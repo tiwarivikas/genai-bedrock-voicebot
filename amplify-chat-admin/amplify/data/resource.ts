@@ -21,11 +21,12 @@ const schema = a.schema({
       token: a.string(),
       bot_status: a.enum(["Active", "Expired", "Disabled"]),
       qchatform_status: a.enum(["Submitted", "Completed", "Error"]),
-      regionQ: a.enum(["NORTH_VIRGINIA", "OREGON"]),
+      regionQ: a.string(),
       expiry_datetime: a.datetime(),
       requester_email: a.email(),
       applicationIdQ: a.string(),
       indexedPages: a.string(),
+      config: a.string(),
     })
     .authorization((allow) => [allow.authenticated()]),
 });
