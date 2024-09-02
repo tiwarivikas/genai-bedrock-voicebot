@@ -173,7 +173,8 @@ export default function QChatListRequests({
       <div className="flex">
         <div className="flex text-xl w-1/2">List of Submitted Forms</div>
         <div className="text-md w-1/2 flex grow right">
-          Ongoing PoCs: {submissions?.length}, Indexing Consumption: {totalIndexedPages ? Math.round(totalIndexedPages) : 0}k / 100K
+          Ongoing PoCs: {submissions?.length}, Indexing Consumption:{" "}
+          {totalIndexedPages ? Math.round(totalIndexedPages) : 0}k / 100K
         </div>
       </div>
       <div className="">
@@ -188,7 +189,9 @@ export default function QChatListRequests({
               <TableHead className="w-[300px]">
                 Status (Indexed Pages)
                 <Button variant="link" onClick={handleIndexedPageStatusRefresh}>
-                  <ArrowPathIcon className={`h-4 ${isProcessing ? "animate-spin" : ""}`} />
+                  <ArrowPathIcon
+                    className={`h-4 ${isProcessing ? "animate-spin" : ""}`}
+                  />
                 </Button>
               </TableHead>
               <TableHead className="flex p-4 font-bold">
@@ -214,7 +217,7 @@ export default function QChatListRequests({
                   {item.token ? (
                     <>
                       <Link
-                        href={item.token.includes("?id=") ? item.token : `https://main.d153z7r4wirmkz.amplifyapp.com?token=${item.token}`}
+                        href={item.token.includes("?id=") ? item.token : ""}
                         target="_blank"
                         className="text-blue-500 underline hover:text-purple-500"
                       >

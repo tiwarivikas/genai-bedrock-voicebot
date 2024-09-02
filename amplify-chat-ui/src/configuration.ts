@@ -25,8 +25,8 @@ export const defaultConfiguration: Configuration = {
 export const defaultQchatConfiguration: QchatConfiguration = {
   token:
     "",
-  apiUrl: window.location.hostname == "chat.cloudevangelist.in" ? "https://cqebvrcsl4.execute-api.ap-south-1.amazonaws.com/" : "https://o5sib7u8b8.execute-api.ap-south-1.amazonaws.com/", //Used for Like/Dislike API calls
-  apiStreamingUrl:  window.location.hostname == "chat.cloudevangelist.in" ? "https://s8hbggefkh.ap-south-1.awsapprunner.com/" : "https://mhpds6ptuv.ap-south-1.awsapprunner.com/" , //Used for Streaming Chat Response (default)
+  apiUrl: process.env.apiGatewayEndpoint || '', //Used for Like/Dislike API calls
+  apiStreamingUrl: process.env.streamingAPIEndpoint || '' , //Used for Streaming Chat Response (default)
   apiVersion: "v2",
   streamGetAnswer: true,
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
