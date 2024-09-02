@@ -32,5 +32,5 @@ export const defaultQchatConfiguration: QchatConfiguration = {
   sourcePattern: "{ *doc_idx *: *([^}]*)}",
 }
 
-console.log("NEXT_PUBLIC_APIGW_ENDPOINT: ", process.env.NEXT_PUBLIC_APIGW_ENDPOINT);
+console.log("NEXT_PUBLIC_APIGW_ENDPOINT:", process.env.NEXT_PUBLIC_APIGW_ENDPOINT);
 console.log("NEXT_PUBLIC_STREAMING_API_ENDPOINT: ", process.env.NEXT_PUBLIC_STREAMING_API_ENDPOINT);

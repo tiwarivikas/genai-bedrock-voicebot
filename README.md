@@ -12,12 +12,12 @@ BHASHINI_USER_ID="<User ID of Bhashini>"
 BHASHINI_API_KEY="<API Key of Bhashini>"
 
 # Configure following environment variables in Amplify Console for the "amplify-chat-ui": 
-REACT_APP_APIGW_ENDPOINT: <HTTP API Gateway URL>
-REACT_APP_STREAMING_API_ENDPOINT: <AppRunner URL>
+NEXT_PUBLIC_APIGW_ENDPOINT: <HTTP API Gateway URL>
+NEXT_PUBLIC_STREAMING_API_ENDPOINT: <AppRunner URL>
 
 
 # Update the Build settings in Amplify Console for the "amplify-chat-ui" to include the following echo commands before running npm run build:
           commands:
-            - echo "REACT_APP_APIGW_ENDPOINT=$REACT_APP_APIGW_ENDPOINT" >> .env
-            - echo "REACT_APP_STREAMING_API_ENDPOINT=$REACT_APP_STREAMING_API_ENDPOINT" >> .env
+            - echo "NEXT_PUBLIC_APIGW_ENDPOINT=$REACT_APP_APIGW_ENDPOINT" >> .env
+            - echo "NEXT_PUBLIC_STREAMING_API_ENDPOINT=$REACT_APP_STREAMING_API_ENDPOINT" >> .env
             - npm run build
