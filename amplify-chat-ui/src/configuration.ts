@@ -25,8 +25,8 @@ export const defaultConfiguration: Configuration = {
 export const defaultQchatConfiguration: QchatConfiguration = {
   token:
     "",
-  apiUrl: import.meta.env.VITE_APIGW_ENDPOINT || '', //Used for Like/Dislike API calls
-  apiStreamingUrl: import.meta.env.VITE_STREAMING_API_ENDPOINT || '' , //Used for Streaming Chat Response (default)
+  apiUrl: (import.meta.env.VITE_APIGW_ENDPOINT || 'UPDATE_ENVIRONMENT_VARIABLE_:_VITE_APIGW_ENDPOINT').replace(/\/?$/, '/'), //Used for Like/Dislike API calls
+  apiStreamingUrl: (import.meta.env.VITE_STREAMING_API_ENDPOINT || 'UPDATE_ENVIRONMENT_VARIABLE_:_VITE_STREAMING_API_ENDPOINT').replace(/\/?$/, '/'), //Used for Streaming Chat Response (default)
   apiVersion: "v2",
   streamGetAnswer: true,
   sourcePattern: "{ *doc_idx *: *([^}]*)}",

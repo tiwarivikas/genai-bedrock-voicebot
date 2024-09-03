@@ -8,19 +8,17 @@ interface AppConfig {
     APPRUNNER_GITHUB_BRANCH_MAIN: string;
     APPRUNNER_GITHUB_BRANCH_SANDBOX: string;
     APPRUNNER_GITHUB_CONNECTION_ARN: string;
-    KENDRA_INDEXID: string;
     CHAT_PROD_API: string;
 }
 
 // Create a configuration object
 const _config: AppConfig = {
-    JWT_SECRET: process.env.JWT_SECRET || '',
-    APPRUNNER_GITHUB_URL: process.env.APPRUNNER_GITHUB_URL || '',
+    JWT_SECRET: process.env.JWT_SECRET || '', //Mandatory
+    APPRUNNER_GITHUB_URL: process.env.APPRUNNER_GITHUB_URL || '', //Mandatory
+    APPRUNNER_GITHUB_CONNECTION_ARN: process.env.APPRUNNER_GITHUB_CONNECTION_ARN || '', //Mandatory
     APPRUNNER_GITHUB_BRANCH_MAIN: process.env.APPRUNNER_GITHUB_BRANCH_MAIN || 'main',
     APPRUNNER_GITHUB_BRANCH_SANDBOX: process.env.APPRUNNER_GITHUB_BRANCH_SANDBOX || 'sandbox',
-    APPRUNNER_GITHUB_CONNECTION_ARN: process.env.APPRUNNER_GITHUB_CONNECTION_ARN || '',
-    KENDRA_INDEXID: process.env.KENDRA_INDEXID || '',
-    CHAT_PROD_API: process.env.CHAT_PROD_API || '',
+    CHAT_PROD_API: process.env.CHAT_PROD_API || 'UPDATE_ENVIRONMENT_VARIABLE_:_CHAT_PROD_API',
 };
 
 

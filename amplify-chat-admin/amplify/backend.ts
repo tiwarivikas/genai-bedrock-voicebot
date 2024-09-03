@@ -29,6 +29,11 @@ if(_config.JWT_SECRET != "") {
     amplifyBackendType,
     amplifyBackendNamespace
   });
+} else {
+  console.log(
+    `********************************************************************************
+    ****************** ERROR: ENVIRONMENT VARIABLES NOT SET *************************
+    *********************************************************************************`)
 }
   
 backend.addOutput({
