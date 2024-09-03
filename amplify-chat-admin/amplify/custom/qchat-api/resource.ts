@@ -23,6 +23,7 @@ export class QChatApi extends Construct {
   public readonly apiExecuteStepFn: string;
   public readonly conversationDDBTableName: string;
   public readonly DDBTable_ConversationSummary: string;
+  public readonly apiStreamingUrl: string;
 
   constructor(scope: Construct, id: string, props: QChatApiProps) {
     super(scope, id);
@@ -570,5 +571,6 @@ export class QChatApi extends Construct {
         instanceRoleArn: appRunnerRole.roleArn,
       }
     }); 
+    this.apiStreamingUrl = appRunnerService.attrServiceUrl;
   }
 }
