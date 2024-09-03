@@ -28,7 +28,8 @@ const amplifyBackendName = backend.auth.resources.userPool.node.tryGetContext(
 );
 
 let qChatApi: any = null;
-if(!_config.JWT_SECRET) {
+if(_config.JWT_SECRET != "") {
+  console.log("Creating QChatApi")
   qChatApi = new QChatApi(backend.createStack("qChatApi"), "qChatApi", {
     cognito_user_pool,
     appSync_url,
