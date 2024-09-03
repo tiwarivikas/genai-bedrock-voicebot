@@ -16,7 +16,7 @@ import _config from "./config/configuration";
 
 import { Construct } from "constructs";
 
-type QChatApiProps = { cognito_user_pool: string; appSync_url: string; amplifyBackendType: string; };
+type QChatApiProps = { cognito_user_pool: string; appSync_url: string; amplifyBackendType: string; amplifyBackendNamespace: string };
 
 export class QChatApi extends Construct {
   public readonly apiEndpoint: string;
@@ -195,6 +195,15 @@ export class QChatApi extends Construct {
         `arn:aws:kendra:${region}:${account}:index/*/data-source/*`,
       ],
     }));
+
+    //Add a policy
+    kendraDataSourceRole.addToPolicy(
+      new iam.PolicyStatement({
+        resources: ["*"],
+        actions: ["logs:*"],
+        effect: iam.Effect.ALLOW,
+      }),
+    );
 
     // Kendra Document actions
     kendraDataSourceRole.addToPolicy(new iam.PolicyStatement({

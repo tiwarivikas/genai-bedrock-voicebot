@@ -14,51 +14,11 @@ const backend = defineBackend({
 
 //Accessing backend DDB Table
 const cognito_user_pool = backend.auth.resources.userPool.userPoolId;
-
-// backend.auth.resources.cfnResources.cfnUserPool.attrUserPoolId;
 const appSync_url = backend.data.resources.graphqlApi.apiId;
-// backend.data.resources.cfnResources.cfnGraphqlApi.attrGraphQlUrl;
+const amplifyBackendType = backend.auth.resources.userPool.node.tryGetContext("amplify-backend-type");
+const amplifyBackendNamespace = backend.auth.resources.userPool.node.tryGetContext("amplify-backend-namespace");
 
-const amplifyBackendType = backend.auth.resources.userPool.node.tryGetContext(
-  "amplify-backend-type"
-);
 
-const amplifyBackendName = backend.auth.resources.userPool.node.tryGetContext(
-  "amplify-backend-name"
-);
-console.log("amplifyBackendName: ", amplifyBackendName)
-
-const amplifyBackendNamespace = backend.auth.resources.userPool.node.tryGetContext(
-  "amplify-backend-namespace"
-);
-console.log("amplifyBackendNamespace: ", amplifyBackendNamespace)
-
-// The Amplify app name or ID
-const amplifyAppNameOrId = 'your-amplify-app-id-or-name';
-
-const amplifyClient = new AmplifyClient({});
-
-// Function to retrieve the Amplify repository URL
-const getAmplifyRepoUrl = async () => {
-  try {
-    const command = new GetAppCommand({ appId: amplifyAppNameOrId });
-    const response = await amplifyClient.send(command);
-    const repositoryUrl = response.app?.repository;
-
-    console.log("repositoryUrl: ", JSON.stringify(response.app))
-    
-    // You can use the repositoryUrl in your CDK logic here
-    console.log('Repository URL:', repositoryUrl);
-
-    return repositoryUrl;
-  } catch (error) {
-    console.error('Error fetching Amplify project:', error);
-    throw error;
-  }
-};
-
- // Retrieve the Amplify repository URL
- await getAmplifyRepoUrl()
 
 let qChatApi: any = null;
 if(_config.JWT_SECRET != "") {
@@ -66,14 +26,14 @@ if(_config.JWT_SECRET != "") {
   qChatApi = new QChatApi(backend.createStack("qChatApi"), "qChatApi", {
     cognito_user_pool,
     appSync_url,
-    amplifyBackendType
+    amplifyBackendType,
+    amplifyBackendNamespace
   });
 }
   
 backend.addOutput({
   custom: {
     amplifyBackendType,
-    amplifyBackendName,
     amplifyBackendNamespace,
     apiGatewayv2Endpoint: qChatApi?.apiEndpoint,
     graphQLAPIId: backend.data.resources.graphqlApi.apiId,
