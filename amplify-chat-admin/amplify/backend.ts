@@ -26,6 +26,7 @@ const amplifyBackendType = backend.auth.resources.userPool.node.tryGetContext(
 const amplifyBackendName = backend.auth.resources.userPool.node.tryGetContext(
   "amplify-backend-name"
 );
+console.log("amplifyBackendName: ", amplifyBackendName)
 
 let qChatApi: any = null;
 if(_config.JWT_SECRET != "") {
