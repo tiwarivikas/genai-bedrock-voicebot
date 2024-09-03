@@ -23,6 +23,12 @@ const amplifyBackendType = backend.auth.resources.userPool.node.tryGetContext(
   "amplify-backend-type"
 );
 
+const amplifyBackendName = backend.auth.resources.userPool.node.tryGetContext(
+  "amplify-backend-name"
+);
+
+console.log("Amplify Backend Type:", amplifyBackendType);
+
 //get repository URL and branch name
 const repositoryUrl = backend.auth.resources.userPool.node.getAllContext()
 
@@ -35,6 +41,7 @@ const qChatApi = new QChatApi(backend.createStack("qChatApi"), "qChatApi", {
 backend.addOutput({
   custom: {
     amplifyBackendType,
+    amplifyBackendName,
     apiGatewayv2Endpoint: qChatApi.apiEndpoint,
     graphQLAPIId: backend.data.resources.graphqlApi.apiId,
     apiExecuteStepFnEndpoint: qChatApi.apiExecuteStepFn,
