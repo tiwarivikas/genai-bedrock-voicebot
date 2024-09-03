@@ -57,6 +57,9 @@ const getAmplifyRepoUrl = async () => {
   }
 };
 
+ // Retrieve the Amplify repository URL
+ await getAmplifyRepoUrl()
+
 let qChatApi: any = null;
 if(_config.JWT_SECRET != "") {
   console.log("Creating QChatApi")
