@@ -28,6 +28,11 @@ const amplifyBackendName = backend.auth.resources.userPool.node.tryGetContext(
 );
 console.log("amplifyBackendName: ", amplifyBackendName)
 
+const amplifyBackendNamespace = backend.auth.resources.userPool.node.tryGetContext(
+  "amplify-backend-namespace"
+);
+console.log("amplifyBackendNamespace: ", amplifyBackendNamespace)
+
 let qChatApi: any = null;
 if(_config.JWT_SECRET != "") {
   console.log("Creating QChatApi")
