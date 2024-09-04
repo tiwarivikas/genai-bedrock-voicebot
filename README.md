@@ -1,3 +1,5 @@
+For detailed instructions, please refer to this Implementation guide: https://www.cloudevangelist.in/2024/09/implementation-guide-for-genai-bedrock.html
+
 # Setup Instructions for genai-bedrock-voicebot
 
 This guide will walk you through the steps to set up the `genai-bedrock-voicebot` projects using AWS Amplify and App Runner.
