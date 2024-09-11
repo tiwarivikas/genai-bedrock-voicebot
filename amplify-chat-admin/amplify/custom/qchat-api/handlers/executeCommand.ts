@@ -83,7 +83,7 @@ export const handler = async function (
         break;
       case "getTotalKendraIndexedDocs":
         const indexId = process.env.KENDRA_INDEXID
-        const kendraClient = new KendraClient({ region: "ap-south-1" });
+        const kendraClient = new KendraClient({  });
         const input = {
           Id: indexId,
         };
@@ -167,7 +167,7 @@ async function queryMessagesByConversastionId(conversationId: string) {
 //Write async function to delete Kendra data source based on provided id as parameter
 async function deleteKendraDataSource(id: string) {
   const indexId = process.env.KENDRA_INDEXID
-  const kendraClient = new KendraClient({ region: "ap-south-1" });
+  const kendraClient = new KendraClient({  });
 
   const deleteCommand = new DeleteDataSourceCommand({
     Id: id,
@@ -186,7 +186,7 @@ async function deleteKendraDataSource(id: string) {
 async function getIndexedDocumentCount(id: string) {
   let indexedDocs = 0;
   const indexId = process.env.KENDRA_INDEXID
-  const kendraClient = new KendraClient({ region: "ap-south-1" });
+  const kendraClient = new KendraClient({  });
 
   const listCommand = new ListDataSourceSyncJobsCommand({
     Id: id,

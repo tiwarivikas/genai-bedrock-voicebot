@@ -3,7 +3,7 @@ const { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamC
 async function executeBedrockAPI(query) {
     try {
 
-        const configBR = { region: "ap-south-1" }
+        const configBR = {};
         const clientBR = new BedrockRuntimeClient(configBR);
         const inputBR = {
             modelId: "mistral.mixtral-8x7b-instruct-v0:1", //"mistral.mistral-7b-instruct-v0:2",
@@ -34,7 +34,7 @@ async function executeBedrockAPI(query) {
 async function executeBedrockStreamingAPI(query) {
     try {
 
-        const configBR = { region: "ap-south-1" }
+        const configBR = {};
         const clientBR = new BedrockRuntimeClient(configBR);
         const inputBR = {
             modelId: "mistral.mixtral-8x7b-instruct-v0:1", //"mistral.mistral-7b-instruct-v0:2",

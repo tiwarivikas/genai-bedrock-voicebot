@@ -2,7 +2,7 @@ const { KendraClient, QueryCommand, QueryResultType, RetrieveCommand } = require
 
 async function retrieveKendraSearch(query, dsId) {
     try {
-        const client = new KendraClient({ region: "ap-south-1" });
+        const client = new KendraClient({});
         const inputKendra = {
             AttributeFilter:
             {

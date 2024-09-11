@@ -27,7 +27,7 @@ export default function DownloadTamperMonekyScript() {
         // Your code here...
         var my_awesome_script = document.createElement('script');
         my_awesome_script.setAttribute("id", "QChatparams")
-        my_awesome_script.setAttribute('src',"https://main.d153z7r4wirmkz.amplifyapp.com/serve.js?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMyIsInVzZXJuYW1lIjoidmlrYXMiLCJlbWFpbCI6InRpd2FyaS52aWthc0BnbWFpbC5jb20iLCJpYXQiOjE3MDgzMTY0MjYsImV4cCI6MTcxMTMxNjQyNn0.mcnlfm0zPZELFIvVF2Z18e4byIYCbXLG8wLo-pfa7gA")
+        my_awesome_script.setAttribute('src',"")
         document.head.appendChild(my_awesome_script);
     })();`;
 

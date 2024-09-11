@@ -117,7 +117,7 @@ async function chat(userMsg: string, decodedToken: any) {
   let nextQuery = '';
 
   try {
-    region = "ap-south-1";
+    //region = "ap-south-1";
     const msg = JSON.parse(userMsg);
     const query = msg.userMessage;
     conversationId = msg.conversationId;
@@ -223,7 +223,7 @@ Response: ${item.response}`)
 
 async function queryKendraFAQs(query: string) {
   try {
-    const client = new KendraClient({ region: "ap-south-1" });
+    const client = new KendraClient({  });
     const inputKendra = {
       AttributeFilter:
       {
@@ -265,7 +265,7 @@ async function queryKendraFAQs(query: string) {
 
 async function retrieveKendraSearch(query: string, dsId: string) {
   try {
-    const client = new KendraClient({ region: "ap-south-1" });
+    const client = new KendraClient({  });
     const inputKendra = {
       AttributeFilter:
       {
@@ -298,7 +298,7 @@ async function retrieveKendraSearch(query: string, dsId: string) {
 async function executeBedrockAPI(query: string) {
   try {
 
-    const configBR = { region: "ap-south-1" }
+    const configBR = {  }
     const clientBR = new BedrockRuntimeClient(configBR);
     const inputBR = {
       modelId: "mistral.mixtral-8x7b-instruct-v0:1", //"mistral.mistral-7b-instruct-v0:2",

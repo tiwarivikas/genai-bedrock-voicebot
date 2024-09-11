@@ -62,7 +62,7 @@ export const handler = async function (
             .toLocaleString("en-us", { weekday: "short" })
             .toUpperCase();
 
-        region = "ap-south-1"
+        //region = "ap-south-1"
         const indexId = process.env.KENDRA_INDEXID
         const inputDS: CreateDataSourceCommandInput =
         {
