@@ -29,6 +29,15 @@ This guide will walk you through the steps to set up the `genai-bedrock-voicebot
 1. Open the [AWS Management Console](https://aws.amazon.com/console/).
 2. Enter your AWS account credentials to log in.
 
+## 2.1. Enable Bedrock "Mixtral 8x7B Instruct" LLM Model Access
+1. Navigate to the Amazon Bedrock service by searching for "Bedrock" in the AWS console search bar
+2. In the Amazon Bedrock console, go to the "Model access" section from the left navigation pane
+3. Click on "Manage model access."
+Locate the "Mixtral 8x7B Instruct" model under the Mistral AI provider
+4. Select the checkbox next to the model to request access.
+5. Review and agree to the End User License Agreement (EULA) if prompted.
+6. Click "Save changes" to submit your access request. Access should be granted shortly after
+
 ## 3. Create a GitHub Connection in AWS App Runner
 
 1. In the AWS Console, search for **App Runner** and open the App Runner console.
@@ -66,7 +75,7 @@ In the **Advanced settings** section, add the following environment variables:
 ## 5. Retrieve API Endpoints
 
 1. Wait for the deployment to complete.
-2. Download the `amplify_output` file from the Amplify console.
+2. Download the `amplify_outputs.json` file from the Amplify console.
 3. Locate the following variables in the last two lines of the file:
    - `VITE_APIGW_ENDPOINT: <HTTP API Gateway URL>`
    - `VITE_STREAMING_API_ENDPOINT: <App Runner URL>`

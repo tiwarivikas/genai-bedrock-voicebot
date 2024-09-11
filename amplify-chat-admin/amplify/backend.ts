@@ -45,7 +45,7 @@ backend.addOutput({
     apiExecuteStepFnEndpoint: qChatApi?.apiExecuteStepFn,
     conversationDDBTableName: qChatApi?.conversationDDBTableName,
     DDBTable_ConversationSummary: qChatApi?.DDBTable_ConversationSummary,
-    VITE_STREAMING_API_ENDPOINT: qChatApi?.apiStreamingUrl,
+    VITE_STREAMING_API_ENDPOINT: "https://" + qChatApi?.apiStreamingUrl,
     VITE_APIGW_ENDPOINT: qChatApi?.apiEndpoint 
   },
 }); 
