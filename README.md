@@ -4,6 +4,9 @@ For detailed instructions, please refer to this Implementation guide: https://ww
 
 This guide will walk you through the steps to set up the `genai-bedrock-voicebot` projects using AWS Amplify and App Runner.
 
+## Architecture
+ ![Fig 1](shared-resources/images/genai-chatbot-architecture.jpg)
+
 ## Table of Contents
 1. [Fork the Repository](#1-fork-the-repository)
 2. [Login to AWS](#2-login-to-aws)
