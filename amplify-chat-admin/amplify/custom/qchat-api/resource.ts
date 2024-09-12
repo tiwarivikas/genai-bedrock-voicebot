@@ -181,6 +181,37 @@ export class QChatApi extends Construct {
     const region = cdk.Stack.of(this).region;
     const account = cdk.Stack.of(this).account;
 
+    // Add custom fields to Kendra Index
+    const customFields = [
+      {
+        name: 'wc_file_name',
+        type: 'STRING_VALUE',
+        description: 'File name for web crawler documents',
+      },
+      {
+        name: 'wc_title',
+        type: 'STRING_VALUE',
+        description: 'Title for web crawler documents',
+      },
+      {
+        name: 's3_document_id',
+        type: 'STRING_VALUE',
+        description: 'Document ID for S3 documents',
+      },
+    ];
+
+    // Add custom fields to the Kendra Index
+    kendraIndex.addPropertyOverride('DocumentMetadataConfigurations', customFields.map(field => ({
+      Name: field.name,
+      Type: field.type,
+      Search: {
+        Facetable: true,
+        Searchable: true,
+        Displayable: true,
+      },
+    })));
+
+    
     // Create the Kendra Data Source IAM Role
     const kendraDataSourceRole = new iam.Role(this, 'KendraDataSourceRole', {
       assumedBy: new iam.ServicePrincipal('kendra.amazonaws.com'), // Trust relationship
