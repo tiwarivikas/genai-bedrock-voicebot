@@ -201,15 +201,26 @@ export class QChatApi extends Construct {
     ];
 
     // Add custom fields to the Kendra Index
-    kendraIndex.addPropertyOverride('DocumentMetadataConfigurations', customFields.map(field => ({
-      Name: field.name,
-      Type: field.type,
-      Search: {
-        Facetable: true,
-        Searchable: true,
-        Displayable: true,
-      },
-    })));
+    kendraIndex.addPropertyOverride('DocumentMetadataConfigurations', [
+      ...customFields.map(field => ({
+        Name: field.name,
+        Type: field.type,
+        Search: {
+          Facetable: true,
+          Searchable: true,
+          Displayable: true,
+        },
+      })),
+      {
+        Name: '_data_source_id',
+        Type: 'STRING_VALUE',
+        Search: {
+          Facetable: true,
+          Searchable: true,
+          Displayable: true,
+        },
+      }
+    ]);
 
     
     // Create the Kendra Data Source IAM Role
