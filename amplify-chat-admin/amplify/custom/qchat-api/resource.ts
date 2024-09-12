@@ -164,6 +164,13 @@ export class QChatApi extends Construct {
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonKendraFullAccess'),
       ],
     });
+    kendraRole.addToPolicy(
+      new iam.PolicyStatement({
+        resources: ["*"],
+        actions: ["logs:*"],
+        effect: iam.Effect.ALLOW,
+      }),
+    );
     // Create the Kendra Index
     const kendraIndex = new kendra.CfnIndex(this, 'MyKendraIndex', {
       name: 'GenAIBedrockVoiceBotKendraIndex',
