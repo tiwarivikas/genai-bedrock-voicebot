@@ -171,57 +171,64 @@ export class QChatApi extends Construct {
         effect: iam.Effect.ALLOW,
       }),
     );
-    // Create the Kendra Index
-    const kendraIndex = new kendra.CfnIndex(this, 'MyKendraIndex', {
-      name: 'GenAIBedrockVoiceBotKendraIndex',
-      edition: 'ENTERPRISE_EDITION',
-      roleArn: kendraRole.roleArn,
-      description: 'An Enterprise Edition Kendra index for searching documents',
-    });
+
     const region = cdk.Stack.of(this).region;
     const account = cdk.Stack.of(this).account;
 
-    // Add custom fields to Kendra Index
-    const customFields = [
-      {
-        name: 'wc_file_name',
-        type: 'STRING_VALUE',
-        description: 'File name for web crawler documents',
-      },
-      {
-        name: 'wc_title',
-        type: 'STRING_VALUE',
-        description: 'Title for web crawler documents',
-      },
-      {
-        name: 's3_document_id',
-        type: 'STRING_VALUE',
-        description: 'Document ID for S3 documents',
-      },
-    ];
-
-    // Add custom fields to the Kendra Index
-    kendraIndex.addPropertyOverride('DocumentMetadataConfigurations', [
-      ...customFields.map(field => ({
-        Name: field.name,
-        Type: field.type,
-        Search: {
-          Facetable: true,
-          Searchable: true,
-          Displayable: true,
+    //Create Index only if KENDRA_INDEXID not provided in environment variable
+    let kendraIndex = null;
+    if(_config.KENDRA_INDEXID == "") {
+      // Create the Kendra Index
+      kendraIndex = new kendra.CfnIndex(this, 'MyKendraIndex', {
+        name: 'GenAIBedrockVoiceBotKendraIndex',
+        edition: 'ENTERPRISE_EDITION',
+        roleArn: kendraRole.roleArn,
+        description: 'An Enterprise Edition Kendra index for searching documents',
+      });
+      
+      
+      // Add custom fields to Kendra Index
+      const customFields = [
+        {
+          name: 'wc_file_name',
+          type: 'STRING_VALUE',
+          description: 'File name for web crawler documents',
         },
-      })),
-      {
-        Name: '_data_source_id',
-        Type: 'STRING_VALUE',
-        Search: {
-          Facetable: true,
-          Searchable: true,
-          Displayable: true,
+        {
+          name: 'wc_title',
+          type: 'STRING_VALUE',
+          description: 'Title for web crawler documents',
         },
-      }
-    ]);
-
+        {
+          name: 's3_document_id',
+          type: 'STRING_VALUE',
+          description: 'Document ID for S3 documents',
+        },
+      ];
+      
+      // Add custom fields to the Kendra Index
+      kendraIndex.addPropertyOverride('DocumentMetadataConfigurations', [
+        ...customFields.map(field => ({
+          Name: field.name,
+          Type: field.type,
+          Search: {
+            Facetable: true,
+            Searchable: true,
+            Displayable: true,
+          },
+        })),
+        {
+          Name: '_data_source_id',
+          Type: 'STRING_VALUE',
+          Search: {
+            Facetable: true,
+            Searchable: true,
+            Displayable: true,
+          },
+        }
+      ]);
+      
+    }
     
     // Create the Kendra Data Source IAM Role
     const kendraDataSourceRole = new iam.Role(this, 'KendraDataSourceRole', {
@@ -332,7 +339,7 @@ export class QChatApi extends Construct {
         runtime: Runtime.NODEJS_18_X,
         role: lambdaCreateQAppRole,
         timeout: Duration.minutes(1),
-        environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, DDBTable_ConversationsList: conversationListTable.tableName, conversationDDBTableName: conversationTable.tableName, KENDRA_INDEXID: kendraIndex.attrId, CHAT_PROD_API: _config.CHAT_PROD_API },
+        environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, DDBTable_ConversationsList: conversationListTable.tableName, conversationDDBTableName: conversationTable.tableName, KENDRA_INDEXID: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID, CHAT_PROD_API: _config.CHAT_PROD_API },
       },
     );
 
@@ -378,7 +385,7 @@ export class QChatApi extends Construct {
         new URL("handlers/chatBRResponseAPIHandler.ts", import.meta.url),
       ),
       runtime: Runtime.NODEJS_18_X,
-      environment: { JWT_SECRET: _config.JWT_SECRET, conversationDDBTableName: conversationTable.tableName, DDBTable_ConversationSummary: conversationListTable.tableName, KENDRA_INDEXID: kendraIndex.attrId },
+      environment: { JWT_SECRET: _config.JWT_SECRET, conversationDDBTableName: conversationTable.tableName, DDBTable_ConversationSummary: conversationListTable.tableName, KENDRA_INDEXID: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID },
       role: lambdachatBRrole,
       timeout: Duration.minutes(5),
     });
@@ -515,7 +522,7 @@ export class QChatApi extends Construct {
       runtime: Runtime.NODEJS_18_X,
       role: lambdaCreateBRAppRole,
       timeout: Duration.minutes(5),
-      environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, API_Endpoint: httpApi.apiEndpoint, CHAT_PROD_API: _config.CHAT_PROD_API, KENDRA_INDEXID: kendraIndex.attrId, KENDRA_DATASOURCE_ROLE: kendraDataSourceRole.roleArn },
+      environment: { JWT_SECRET: _config.JWT_SECRET, DDBTable_URLShortener: URLShortenerTable.tableName, API_Endpoint: httpApi.apiEndpoint, CHAT_PROD_API: _config.CHAT_PROD_API, KENDRA_INDEXID: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID, KENDRA_DATASOURCE_ROLE: kendraDataSourceRole.roleArn },
     });
 
     // Define API Gateway resource
@@ -605,11 +612,7 @@ export class QChatApi extends Construct {
                 },
                 {
                   name: "KENDRA_INDEXID",
-                  value: kendraIndex.attrId
-                },
-                {
-                  name: "TEST",
-                  value: "TEST"
+                  value: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID
                 },
               ]
             },

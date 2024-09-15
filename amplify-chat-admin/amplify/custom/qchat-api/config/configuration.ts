@@ -9,6 +9,7 @@ interface AppConfig {
     APPRUNNER_GITHUB_BRANCH_SANDBOX: string;
     APPRUNNER_GITHUB_CONNECTION_ARN: string;
     CHAT_PROD_API: string;
+    KENDRA_INDEXID: string;
 }
 
 // Create a configuration object
@@ -19,6 +20,7 @@ const _config: AppConfig = {
     APPRUNNER_GITHUB_BRANCH_MAIN: process.env.APPRUNNER_GITHUB_BRANCH_MAIN || 'main',
     APPRUNNER_GITHUB_BRANCH_SANDBOX: process.env.APPRUNNER_GITHUB_BRANCH_SANDBOX || 'sandbox',
     CHAT_PROD_API: process.env.CHAT_PROD_API || 'UPDATE_ENVIRONMENT_VARIABLE_:_CHAT_PROD_API',
+    KENDRA_INDEXID: process.env.KENDRA_INDEXID || '',
 };
 
 
