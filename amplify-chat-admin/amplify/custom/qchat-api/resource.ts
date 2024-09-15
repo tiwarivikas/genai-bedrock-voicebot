@@ -176,7 +176,7 @@ export class QChatApi extends Construct {
     const account = cdk.Stack.of(this).account;
 
     //Create Index only if KENDRA_INDEXID not provided in environment variable
-    let kendraIndex = null;
+    let kendraIndex:any = null;
     if(_config.KENDRA_INDEXID == "") {
       // Create the Kendra Index
       kendraIndex = new kendra.CfnIndex(this, 'MyKendraIndex', {
