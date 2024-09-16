@@ -11,9 +11,11 @@ import Link from "next/link";
 export default async function DownloadTamperMonekyScript({
   domainName,
   chatbotURL,
+  customerName,
 }: {
   domainName: string;
   chatbotURL: string;
+  customerName: string;
 }) {
   const scriptContent = `
     // ==UserScript==
@@ -54,7 +56,7 @@ export default async function DownloadTamperMonekyScript({
     //return url;
     const a = document.createElement("a");
     a.href = url;
-    a.download = `qchat-script.user.js`;
+    a.download = `qchat-script-${customerName}.user.js`;
     document.body.appendChild(a);
     a.click();
     URL.revokeObjectURL(url);
@@ -74,25 +76,6 @@ export default async function DownloadTamperMonekyScript({
       </Tooltip>
     </TooltipProvider>
   );
-  /* <div>
-      <input
-        type="text"
-        value={scriptName}
-        onChange={(e) => setScriptName(e.target.value)}
-        placeholder="Enter script name"
-      />
-      <button onClick={generateScript}>Generate Script</button>
-      <button onClick={downloadScript} disabled={!scriptContent}>
-        Download Script
-      </button>
-      <textarea
-        value={scriptContent}
-        onChange={(e) => setScriptContent(e.target.value)}
-        rows={10}
-        cols={50}
-        placeholder="Generated Script Content"
-      />
-    </div> */
 }
 async function getRedirectUrl(url) {
   try {
@@ -112,6 +95,6 @@ async function getRedirectUrl(url) {
 function formatURL(url) {
   //Retrieve the URL hostname, queryparams and add serve.js as path before '?'
   const parsedUrl = new URL(url);
-  const formattedUrl = `${parsedUrl.origin}${parsedUrl.pathname}/serve.js${parsedUrl.search}`;
+  const formattedUrl = `${parsedUrl.origin}${parsedUrl.pathname}serve.js${parsedUrl.search}`;
   return formattedUrl;
 }

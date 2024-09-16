@@ -227,6 +227,7 @@ export default function QChatListRequests({
                       <DownloadTamperMonekyScript
                         domainName={new URL(item.website).hostname}
                         chatbotURL={item.token}
+                        customerName={item.customer}
                       />
                     </>
                   ) : (
