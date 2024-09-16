@@ -73,13 +73,16 @@ export default function QChatListRequests({
   async function refreshIndexingStatus(submission: any) {
     try {
       const { idToken } = (await fetchAuthSession()).tokens ?? {};
-      const endpoint_url = config.custom.apiExecuteStepFnEndpoint;
+      const endpoint_url = (config as any).custom.apiExecuteStepFnEndpoint;
       const client = generateClient<Schema>();
 
       var isOwner = false;
-      emailId === submission.requester_email ? isOwner = true : '';
+      emailId === submission.requester_email ? (isOwner = true) : "";
 
-      if (/* !isAdmin && !isOwner &&  */submission.indexedPages && parseInt(submission.indexedPages, 10) > 0)
+      if (
+        /* !isAdmin && !isOwner &&  */ submission.indexedPages &&
+        parseInt(submission.indexedPages, 10) > 0
+      )
         return;
 
       const requestOptions: any = {
@@ -99,7 +102,7 @@ export default function QChatListRequests({
 
       const response = await fetch(
         `${endpoint_url}executeCommand`,
-        requestOptions,
+        requestOptions
       );
       const data = await response.json();
       const indexedPages = data.indexedPages;
@@ -118,7 +121,7 @@ export default function QChatListRequests({
   async function getTotalKendraIndexedDocs() {
     try {
       const { idToken } = (await fetchAuthSession()).tokens ?? {};
-      const endpoint_url = config.custom.apiExecuteStepFnEndpoint;
+      const endpoint_url = (config as any).custom.apiExecuteStepFnEndpoint;
       const client = generateClient<Schema>();
 
       const requestOptions: any = {
@@ -129,20 +132,18 @@ export default function QChatListRequests({
         },
         body: JSON.stringify({
           type: "getTotalKendraIndexedDocs",
-          content: {
-          },
+          content: {},
         }),
       };
 
       const response = await fetch(
         `${endpoint_url}executeCommand`,
-        requestOptions,
+        requestOptions
       );
       const data = await response.json();
       const totalPages = data.totalKendraIndexedDocs;
 
       setTotalIndexedPages(totalPages / 1000);
-
     } catch (err) {
       console.log(err);
     }
@@ -162,7 +163,6 @@ export default function QChatListRequests({
       console.log(err);
     }
   }
-
 
   return (
     <main>
@@ -224,7 +224,10 @@ export default function QChatListRequests({
                         {item.chatbotname}
                         <ArrowTopRightOnSquareIcon className="h-4 pl-2 inline-flex" />
                       </Link>
-                      <DownloadTamperMonekyScript />
+                      <DownloadTamperMonekyScript
+                        domainName={new URL(item.website).hostname}
+                        chatbotURL={item.token}
+                      />
                     </>
                   ) : (
                     item.chatbotname

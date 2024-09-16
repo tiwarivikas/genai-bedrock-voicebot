@@ -8,15 +8,21 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-export default function DownloadTamperMonekyScript() {
+export default function DownloadTamperMonekyScript({
+  domainName,
+  chatbotURL,
+}: {
+  domainName: string;
+  chatbotURL: string;
+}) {
   const scriptContent = `
     // ==UserScript==
     // @name         QChatBot Integration
     // @namespace    http://tampermonkey.net/
     // @version      2024-02-14
-    // @description  try to take over the world!
+    // @description  Embed the Chatbot within any website!
     // @author       You
-    // @match        https://www.du.ac.in/*
+    // @match        https://${domainName}/*
     // @icon         https://www.google.com/s2/favicons?sz=64&domain=undefined.localhost
     // @grant        none
     // ==/UserScript==
@@ -27,29 +33,29 @@ export default function DownloadTamperMonekyScript() {
         // Your code here...
         var my_awesome_script = document.createElement('script');
         my_awesome_script.setAttribute("id", "QChatparams")
-        my_awesome_script.setAttribute('src',"")
+        my_awesome_script.setAttribute('src',"${getRedirectUrl(chatbotURL)}")
         document.head.appendChild(my_awesome_script);
     })();`;
 
   const downloadScript = () => {
     const blob = new Blob([scriptContent], { type: "text/javascript" });
     const url = URL.createObjectURL(blob);
-    return url;
-    /* const a = document.createElement("a");
+    //return url;
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `phone-tool-who's-hiring!%3F!.user.js`;
+    a.download = `qchat-script.user.js`;
     document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url); */
+    URL.revokeObjectURL(url);
   };
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href="">
+          <button onClick={downloadScript}>
             <ArrowDownTrayIcon className="h-4 inline-flex" />
-          </Link>
+          </button>
         </TooltipTrigger>
         <TooltipContent>
           <p>😇 Download Tampermonkey Script to embed Chatbot in website!</p>
@@ -76,4 +82,28 @@ export default function DownloadTamperMonekyScript() {
         placeholder="Generated Script Content"
       />
     </div> */
+}
+async function getRedirectUrl(url) {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      redirect: "manual",
+    });
+
+    if (response.status === 301) {
+      return formatURL(response.headers.get("Location"));
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+}
+
+function formatURL(url) {
+  //Retrieve the URL hostname, queryparams and add serve.js as path before '?'
+  const parsedUrl = new URL(url);
+  const formattedUrl = `${parsedUrl.origin}${parsedUrl.pathname}/serve.js${parsedUrl.search}`;
+  return formattedUrl;
 }
