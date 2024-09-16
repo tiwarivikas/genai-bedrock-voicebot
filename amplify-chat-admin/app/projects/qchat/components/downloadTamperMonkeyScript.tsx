@@ -33,21 +33,29 @@ export default async function DownloadTamperMonekyScript({
         // Your code here...
         var my_awesome_script = document.createElement('script');
         my_awesome_script.setAttribute("id", "QChatparams")
-        my_awesome_script.setAttribute('src',"${await getRedirectUrl(chatbotURL)}")
+        my_awesome_script.setAttribute('src','##URL##')
         document.head.appendChild(my_awesome_script);
     })();`;
 
-  const downloadScript = () => {
-    const blob = new Blob([scriptContent], { type: "text/javascript" });
-    const url = URL.createObjectURL(blob);
-    //return url;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `qchat-script.user.js`;
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    const downloadScript = async () => {
+      const urlWithToken = (await getRedirectUrl(chatbotURL)) || "";
+      //Replace string ##URL## with urlWithToken in scriptContent
+      const scriptContentWithToken = scriptContent.replace(
+        "##URL##",
+        urlWithToken
+      );
+      const blob = new Blob([scriptContentWithToken], {
+        type: "text/javascript",
+      });
+      const url = URL.createObjectURL(blob);
+      //return url;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qchat-script.user.js`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+    };
 
   return (
     <TooltipProvider>
