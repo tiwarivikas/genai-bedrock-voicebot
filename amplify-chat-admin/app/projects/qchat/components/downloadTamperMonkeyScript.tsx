@@ -98,14 +98,11 @@ async function getRedirectUrl(url) {
   try {
     const response = await fetch(url + "&redirectUrl=true", {
       method: "GET",
-      redirect: "manual",
     });
 
-    if (response.status === 301) {
-      return formatURL(response.headers.get("Location"));
-    } else {
-      return null;
-    }
+    const data = await response.json();
+
+    return formatURL(data);
   } catch (error) {
     console.error("Error:", error);
     return null;
