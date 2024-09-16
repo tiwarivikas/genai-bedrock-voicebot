@@ -51,7 +51,7 @@ export default function QChatListRequests({
     queryFn: () =>
       client.models.QChatRequest.list()
         .then((list) => list.data)
-        .then((list) => list.filter(item => item.bot_status != "Disabled"))
+        .then((list) => list.filter((item) => item.bot_status != "Disabled"))
         .then((list) => sortByCreationDate(list)),
   });
 
@@ -64,11 +64,10 @@ export default function QChatListRequests({
         total += parseInt(submission.indexedPages, 10);
       }
     } */
-    getTotalKendraIndexedDocs()
-
+    getTotalKendraIndexedDocs();
   }, [submissions]);
 
-  if (isFetching) return <Skeleton />;
+  /* if (isFetching) return <Skeleton />; */
 
   async function refreshIndexingStatus(submission: any) {
     try {
