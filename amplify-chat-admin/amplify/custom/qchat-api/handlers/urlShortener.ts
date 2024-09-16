@@ -84,7 +84,6 @@ async function fetchURLfromDDB(id: string) {
         });
 
         const response = await docClient.send(command);
-        console.log(response);
         return response.Item?.redirectURL || response.Item?.url;
 
     } catch (err) {

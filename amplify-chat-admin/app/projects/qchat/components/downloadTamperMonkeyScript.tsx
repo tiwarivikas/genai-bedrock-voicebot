@@ -19,7 +19,7 @@ export default async function DownloadTamperMonekyScript({
 }) {
   const scriptContent = `
     // ==UserScript==
-    // @name         QChatBot Integration
+    // @name         QChatBot Integration - ${customerName}
     // @namespace    http://tampermonkey.net/
     // @version      2024-02-14
     // @description  Embed the Chatbot within any website!
