@@ -22,6 +22,10 @@ exports.handler = async (event: any) => {
         ? event.queryStringParameters["id"]
         : "";
 
+    const retrieveRedirectUrl = event.queryStringParameters
+        ? event.queryStringParameters["redirectUrl"]
+        : "";
+
     try {
         if (!id) {
             errorMessage =
@@ -40,6 +44,18 @@ exports.handler = async (event: any) => {
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
             },
             body: JSON.stringify({ message: "The URL is not valid" }),
+        };
+    }
+
+    if(retrieveRedirectUrl) {
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            },
+            body: redirectUrl
         };
     }
 

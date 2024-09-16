@@ -37,25 +37,28 @@ export default async function DownloadTamperMonekyScript({
         document.head.appendChild(my_awesome_script);
     })();`;
 
-    const downloadScript = async () => {
-      const urlWithToken = (await getRedirectUrl(chatbotURL)) || "";
-      //Replace string ##URL## with urlWithToken in scriptContent
-      const scriptContentWithToken = scriptContent.replace(
-        "##URL##",
-        urlWithToken
-      );
-      const blob = new Blob([scriptContentWithToken], {
-        type: "text/javascript",
-      });
-      const url = URL.createObjectURL(blob);
-      //return url;
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `qchat-script.user.js`;
-      document.body.appendChild(a);
-      a.click();
-      URL.revokeObjectURL(url);
-    };
+  const downloadScript = async () => {
+    const urlWithToken = (await getRedirectUrl(chatbotURL)) || "";
+
+    if (urlWithToken == "") return null;
+
+    //Replace string ##URL## with urlWithToken in scriptContent
+    const scriptContentWithToken = scriptContent.replace(
+      "##URL##",
+      urlWithToken
+    );
+    const blob = new Blob([scriptContentWithToken], {
+      type: "text/javascript",
+    });
+    const url = URL.createObjectURL(blob);
+    //return url;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `qchat-script.user.js`;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <TooltipProvider>
@@ -93,7 +96,7 @@ export default async function DownloadTamperMonekyScript({
 }
 async function getRedirectUrl(url) {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(url + "&redirectUrl=true", {
       method: "GET",
       redirect: "manual",
     });
