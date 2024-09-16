@@ -55,7 +55,7 @@ exports.handler = async (event: any) => {
                 "Access-Control-Allow-Methods": "GET",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
             },
-            body: redirectUrl
+            body: {redirectUrl}
         };
     }
 
