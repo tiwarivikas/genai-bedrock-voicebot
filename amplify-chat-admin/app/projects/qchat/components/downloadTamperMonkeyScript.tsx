@@ -102,7 +102,7 @@ async function getRedirectUrl(url) {
 
     const data = await response.json();
 
-    return formatURL(data);
+    return formatURL(data.redirectUrl);
   } catch (error) {
     console.error("Error:", error);
     return null;
