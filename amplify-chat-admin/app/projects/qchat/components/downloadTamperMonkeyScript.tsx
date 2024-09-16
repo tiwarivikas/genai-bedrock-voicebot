@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-export default function DownloadTamperMonekyScript({
+export default async function DownloadTamperMonekyScript({
   domainName,
   chatbotURL,
 }: {
@@ -33,7 +33,7 @@ export default function DownloadTamperMonekyScript({
         // Your code here...
         var my_awesome_script = document.createElement('script');
         my_awesome_script.setAttribute("id", "QChatparams")
-        my_awesome_script.setAttribute('src',"${getRedirectUrl(chatbotURL)}")
+        my_awesome_script.setAttribute('src',"${await getRedirectUrl(chatbotURL)}")
         document.head.appendChild(my_awesome_script);
     })();`;
 
