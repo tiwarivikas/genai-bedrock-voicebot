@@ -52,10 +52,11 @@ export default function QChatListRequests({
     queryFn: () =>
       client.models.QChatRequest.list()
         .then((list) => list.data)
-        .then((list) => list.filter((item) => item.bot_status != "Disabled"))
+        .then((list) => list.filter(item => item.bot_status != "Disabled"))
         .then((list) => sortByCreationDate(list)),
   });
 
+<<<<<<< HEAD
   const getTotalKendraIndexedDocs = useCallback(async () => {
     try {
       const { idToken } = (await fetchAuthSession()).tokens ?? {};
@@ -91,6 +92,22 @@ export default function QChatListRequests({
       getTotalKendraIndexedDocs();
     }
   }, [submissions, getTotalKendraIndexedDocs]);
+=======
+  useEffect(() => {
+    if (submissions === null || submissions === undefined) return;
+    let total = 0;
+    /*
+    for (const submission of submissions) {
+      if (submission.indexedPages && parseInt(submission.indexedPages, 10) > 0) {
+        total += parseInt(submission.indexedPages, 10);
+      }
+    } */
+    getTotalKendraIndexedDocs()
+
+  }, [submissions]);
+
+  if (isFetching) return <Skeleton />;
+>>>>>>> parent of 81a5302 (fix: removing flickering from UI updates.)
 
   async function refreshIndexingStatus(submission: any) {
     try {
