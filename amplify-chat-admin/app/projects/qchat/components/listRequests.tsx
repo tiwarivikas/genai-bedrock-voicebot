@@ -23,6 +23,7 @@ import StatusUpdate from "./statusUpdate";
 import config from "@/amplify_outputs.json";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
+import { useCallback } from "react";
 
 function sortByCreationDate(array: any) {
   return array.sort((a: any, b: any) => {
@@ -55,19 +56,41 @@ export default function QChatListRequests({
         .then((list) => sortByCreationDate(list)),
   });
 
-  useEffect(() => {
-    if (submissions === null || submissions === undefined) return;
-    let total = 0;
-    /*
-    for (const submission of submissions) {
-      if (submission.indexedPages && parseInt(submission.indexedPages, 10) > 0) {
-        total += parseInt(submission.indexedPages, 10);
-      }
-    } */
-    getTotalKendraIndexedDocs();
-  }, [submissions]);
+  const getTotalKendraIndexedDocs = useCallback(async () => {
+    try {
+      const { idToken } = (await fetchAuthSession()).tokens ?? {};
+      const endpoint_url = (config as any).custom.apiExecuteStepFnEndpoint;
 
-  /* if (isFetching) return <Skeleton />; */
+      const requestOptions: any = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: idToken,
+        },
+        body: JSON.stringify({
+          type: "getTotalKendraIndexedDocs",
+          content: {},
+        }),
+      };
+
+      const response = await fetch(
+        `${endpoint_url}executeCommand`,
+        requestOptions
+      );
+      const data = await response.json();
+      const totalPages = data.totalKendraIndexedDocs;
+
+      setTotalIndexedPages(Math.round(totalPages / 1000));
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (submissions && submissions.length > 0) {
+      getTotalKendraIndexedDocs();
+    }
+  }, [submissions, getTotalKendraIndexedDocs]);
 
   async function refreshIndexingStatus(submission: any) {
     try {
@@ -112,37 +135,6 @@ export default function QChatListRequests({
           id: submission.id,
         });
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function getTotalKendraIndexedDocs() {
-    try {
-      const { idToken } = (await fetchAuthSession()).tokens ?? {};
-      const endpoint_url = (config as any).custom.apiExecuteStepFnEndpoint;
-      const client = generateClient<Schema>();
-
-      const requestOptions: any = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: idToken,
-        },
-        body: JSON.stringify({
-          type: "getTotalKendraIndexedDocs",
-          content: {},
-        }),
-      };
-
-      const response = await fetch(
-        `${endpoint_url}executeCommand`,
-        requestOptions
-      );
-      const data = await response.json();
-      const totalPages = data.totalKendraIndexedDocs;
-
-      setTotalIndexedPages(totalPages / 1000);
     } catch (err) {
       console.log(err);
     }
