@@ -22,7 +22,7 @@ const _config: AppConfig = {
     CHAT_PROD_API: process.env.CHAT_PROD_API || 'UPDATE_ENVIRONMENT_VARIABLE_:_CHAT_PROD_API',
     KENDRA_INDEXID: process.env.KENDRA_INDEXID || '',
 };
-
+//test
 
 // Export the configuration
 export default _config;
