@@ -51,52 +51,11 @@ export default function QChatListRequests({
     queryFn: () =>
       client.models.QChatRequest.list()
         .then((list) => list.data)
-        .then((list) => list.filter(item => item.bot_status != "Disabled"))
+        .then((list) => list.filter((item) => item.bot_status != "Disabled"))
         .then((list) => sortByCreationDate(list)),
   });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const getTotalKendraIndexedDocs = useCallback(async () => {
-    try {
-      const { idToken } = (await fetchAuthSession()).tokens ?? {};
-      const endpoint_url = (config as any).custom.apiExecuteStepFnEndpoint;
-
-      const requestOptions: any = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: idToken,
-        },
-        body: JSON.stringify({
-          type: "getTotalKendraIndexedDocs",
-          content: {},
-        }),
-      };
-
-      const response = await fetch(
-        `${endpoint_url}executeCommand`,
-        requestOptions
-      );
-      const data = await response.json();
-      const totalPages = data.totalKendraIndexedDocs;
-
-      setTotalIndexedPages(Math.round(totalPages / 1000));
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
   useEffect(() => {
-    if (submissions && submissions.length > 0) {
-      getTotalKendraIndexedDocs();
-    }
-  }, [submissions, getTotalKendraIndexedDocs]);
-=======
-  useEffect(() => {
-=======
-  useEffect(() => {
->>>>>>> parent of 4157e71 (fix: resolving double reload issue)
     if (submissions === null || submissions === undefined) return;
     let total = 0;
     /*
@@ -105,19 +64,10 @@ export default function QChatListRequests({
         total += parseInt(submission.indexedPages, 10);
       }
     } */
-<<<<<<< HEAD
-    getTotalKendraIndexedDocs()
-
-  }, [submissions]);
-
-  if (isFetching) return <Skeleton />;
->>>>>>> parent of 81a5302 (fix: removing flickering from UI updates.)
-=======
     getTotalKendraIndexedDocs();
   }, [submissions]);
 
   /* if (isFetching) return <Skeleton />; */
->>>>>>> parent of 4157e71 (fix: resolving double reload issue)
 
   async function refreshIndexingStatus(submission: any) {
     try {
