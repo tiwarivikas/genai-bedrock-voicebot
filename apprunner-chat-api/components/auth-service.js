@@ -1,7 +1,7 @@
 
 const jwt = require('jsonwebtoken');
 
-
+console.log(process.env.JWT_SECRET);
 
 // Middleware to validate JWT
 function authenticateJWT(req, res, next) {
