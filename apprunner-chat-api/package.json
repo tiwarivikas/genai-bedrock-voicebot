@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -17,11 +18,17 @@
     "@aws-sdk/client-polly": "^3.631.0",
     "@aws-sdk/client-translate": "^3.637.0",
     "@aws-sdk/lib-dynamodb": "^3.624.0",
+    "@dotenvx/dotenvx": "^1.14.1",
     "axios": "^1.7.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "html-escaper": "^3.0.3",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^9.10.0",
+    "eslint-plugin-jsdoc": "^50.2.4"
   }
 }

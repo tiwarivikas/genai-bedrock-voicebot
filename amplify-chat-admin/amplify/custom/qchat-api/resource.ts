@@ -70,6 +70,18 @@ export class QChatApi extends Construct {
     this.conversationDDBTableName = conversationTable.tableName;
 
     // ****************************************************************
+    // ***** DynamoDB Table: Store Agent Context  ********
+    // ****************************************************************
+    const agentContextTable = new dynamodb.TableV2(this, 'chatBRStateInfoDDB', {
+      partitionKey: { name: 'contextId', type: dynamodb.AttributeType.STRING },
+      pointInTimeRecovery: true,
+      billing: dynamodb.Billing.onDemand(),
+      deletionProtection: false,
+      timeToLiveAttribute: "ttl",
+    });
+    
+
+    // ****************************************************************
     // ***** Lambda: Handle Chat Response with Amazon Q backend *******
     // ****************************************************************
     //Create IAM role
@@ -614,6 +626,10 @@ export class QChatApi extends Construct {
                   name: "KENDRA_INDEXID",
                   value: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID
                 },
+                {
+                  name: "agentContextDDBTableName",
+                  value: agentContextTable.tableName
+                }
               ]
             },
           },

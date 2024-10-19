@@ -1,64 +1,102 @@
-const { queryAvailableTools } = require("./store-tools");
-const { retrieveStateInfo, storeStateInfo } = require("./store-stateInfo");
-const { executeBedrockAPI } = require("../llm-service/bedrock-services");
+const { queryAvailableTools } = require("./utils/store-tools");
+const {
+  retrieveAgentContext,
+  storeAgentContext,
+} = require("./utils/store-agent-context");
+const { executeBedrockAPI } = require("./utils/bedrock-services");
+const { getPrompt } = require("./utils/prompts");
+const { executeTools } = require("./utils/execute-tools");
+//Define structure of context
+/* const context = {
+  query: "",
+  executionId: "",
+  appId: "",
+  conversationId: "",
+  resumeWorkflow: "",
+  availableTools: [],
+  previousState: {},
+}; */
 
-async function executeStepFunction(stateInput) {
+//Define structure of a tool
+const tool = {
+  name: "",
+  description: "",
+  InputParams: [
+    {
+      name: "",
+      type: "",
+      description: "",
+      required: "",
+      inputPrompt: "",
+    },
+  ],
+};
+
+async function executeWorkflow(userMsg, decodedToken, isSpeakerEnabled) {
+  const {
+    userMessage: originalQuery,
+    conversationId: convId,
+    resumeWorkflow,
+  } = JSON.parse(userMsg);
+
   let currentState = "Is New Request?";
-  let context = { stateInput };
+  let context = {
+    query: originalQuery,
+    conversationId: convId,
+    appId: decodedToken.applicationIdQ,
+    resumeWorkflow: resumeWorkflow,
+    isSpeakerEnabled: isSpeakerEnabled,
+  };
 
   while (currentState) {
+    console.log("******  currentState  *******");
+    console.log(currentState);
     switch (currentState) {
       case "Is New Request?":
-        if (context.stateInput.ResumeWorkflow === "No") {
+        if (context.contextId != null) {
           currentState = "Retrieve Previous State";
+          context.toolResponse = context.query;
         } else {
           currentState = "Retrieve available Tools";
         }
         break;
 
       case "Retrieve Previous State":
-        context.previousState = await retrieveStateInfo(
-          stateInput.conversationId
-        );
-        currentState = "Collect Input Parameters";
+        const previousState = await retrieveAgentContext(context.contextId);
+        context = { ...context, ...previousState };
+        currentState = "Execute Tools";
         break;
 
       case "Retrieve available Tools":
-        const tools = await queryAvailableTools(stateInput.appId);
-        context.stateInput.AvailableTools = tools;
+        const tools = await queryAvailableTools(context.appId);
+        context.availableTools = tools;
         currentState = "Understand Context & Tool Selection";
         break;
 
       case "Understand Context & Tool Selection":
-        const modelResponse = await evaluateAvailableInformation(context);
-        currentState = "Collect Input Parameters";
+        await evaluateAvailableInformation(context);
+        currentState = "Execute Tools";
         break;
 
-      case "Collect Input Parameters":
-        currentState = await collectInputParameters(context);
-        break;
-
-      case "Inputs Required?":
-        if (context.stateInput.LambdaFn === "Yes") {
-          currentState = "Send Response asking for user input";
-        } else {
-          currentState = "Execute Tools";
-        }
-        break;
-
-      case "Send Response asking for user input":
-        await invokeLambdaFunction(context.stateInput.LambdaFn, context);
+      case "User Input Required":
+        const outputMsg = await sendUserInputRequiredMessage(context);
         currentState = null; // End the state machine here
+        return outputMsg;
         break;
 
       case "Execute Tools":
-        await executeTools(context.stateInput);
-        currentState = "Prepare Response";
+        currentState = await executeTools(context);
         break;
 
       case "Prepare Response":
-        await prepareResponse(context.stateInput);
+        const response = await prepareResponse(context);
         currentState = null; // End the state machine here
+        return response;
+        break;
+      case "OTP_VALIDATION":
+        const otpValidation = await executeTools(context);
+        currentState = null; // End the state machine here
+        return otpValidation;
         break;
 
       default:
@@ -68,57 +106,44 @@ async function executeStepFunction(stateInput) {
   }
 }
 
-async function collectInputParameters(context) {
-  const lambdaResponse = await invokeLambdaFunction(
-    context.stateInput.LambdaFn,
-    context
-  );
-
-  if (context.stateInput.LambdaFn === "Yes") {
-    await evaluateAvailableInformation(context);
-    return "Ask for User Input";
-  }
-  return "No Inputs Required";
-}
-
-async function invokeLambdaFunction(lambdaFn, payload) {
-  return lambda
-    .invoke({
-      FunctionName: lambdaFn,
-      Payload: JSON.stringify(payload),
-    })
-    .promise();
-}
-
 async function evaluateAvailableInformation(context) {
-  const modelResponse = await executeBedrockAPI(context.stateInput.Prompt);
-  return modelResponse;
-}
-
-async function executeTools(stateInput) {
-  // Example of executing multiple Lambda functions
-  await Promise.all(
-    stateInput.AvailableTools.map(async (tool) => {
-      await invokeLambdaFunction(tool.LambdaFn, stateInput);
-    })
+  console.log("******  evaluateAvailableInformation  *******");
+  const modelResponse = await executeBedrockAPI(
+    getPrompt("EXECUTION_PLAN", context)
   );
+  if (modelResponse.executionPlan) {
+    context.executionPlan = modelResponse.executionPlan;
+    console.log("******  executionPlan  *******");
+    console.log(context.executionPlan);
+  }
+  return "";
 }
 
-async function prepareResponse(stateInput) {
-  const modelResponse = await executeBedrockAPI(stateInput.Prompt);
+async function sendUserInputRequiredMessage(context) {
+  console.log("******  sendUserInputRequiredMessage  *******");
+  // Save the context to DynamoDB
+  const contextId = await storeAgentContext(context);
+
+  // Write to Response stream
+  const response = {
+    type: "USER_INPUT_REQUIRED",
+    message: `Please provide details for ${context.userInputRequiredParams}`,
+    contextId: contextId,
+  };
+
+  // Assuming there's a function to write to the response stream
+  //await writeToResponseStream(response);
+  return response;
+}
+
+async function prepareResponse(context) {
+  console.log("******  prepareResponse  *******");
+  const modelResponse = await executeBedrockAPI(
+    getPrompt("PREPARE_RESPONSE", context)
+  );
   return modelResponse;
 }
 
-// Sample input to execute the state machine
-const stateInput = {
-  ResumeWorkflow: "Yes",
-  LambdaFn: "my-lambda-function",
-  AvailableTools: [
-    { LambdaFn: "tool-lambda-1" },
-    { LambdaFn: "tool-lambda-2" },
-  ],
+module.exports = {
+  executeWorkflow,
 };
-
-executeStepFunction(stateInput)
-  .then(() => console.log("Step Function executed successfully"))
-  .catch((error) => console.error("Error executing Step Function:", error));

@@ -35,7 +35,7 @@ export default function Page() {
     //Trigger Workflow API
     try {
       const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
-      const endpoint_url = config.custom.apiExecuteStepFnEndpoint;
+      const endpoint_url = (config.custom as any).apiExecuteStepFnEndpoint;
 
       setProgress(60);
       setProgressMessage([
