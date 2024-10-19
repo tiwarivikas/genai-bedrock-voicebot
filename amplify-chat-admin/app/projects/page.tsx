@@ -11,10 +11,12 @@ import { Link } from "@aws-amplify/ui-react";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 import { useUser } from "./UserContext";
+import { redirect } from "next/navigation";
 
 export default function Page() {
+  redirect("/projects/qchat");
 
-  const { dispatch } = useUser();
+  /* const { dispatch } = useUser();
   useEffect(() => {
     dispatch({ type: "SETPROJECT", payload: { projectName: "List of Projects" } })
   }, [])
@@ -44,9 +46,9 @@ export default function Page() {
       content: 'If you want a single API endpoint that allows periodic automated refresh of JWTTokens to access restricted content cached in CDN.',
       footer: <Link href="/demos/mmi-cdn" >Link <ArrowRightCircleIcon className="w-6" /></Link>
     }
-  ]
+  ] */
 
-  return (
+  /* return (
     <main>
       <div className="flex gap-6">
         {projects?.map(item => {
@@ -67,5 +69,5 @@ export default function Page() {
         })}
       </div>
     </main>
-  );
+  ); */
 }

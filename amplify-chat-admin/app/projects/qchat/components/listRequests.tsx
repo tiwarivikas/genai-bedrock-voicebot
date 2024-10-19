@@ -23,6 +23,22 @@ import StatusUpdate from "./statusUpdate";
 import config from "@/amplify_outputs.json";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Label,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import { Select } from "@/components/ui/select";
+import { Label as LocalLabel } from "@/components/ui/label";
 
 function sortByCreationDate(array: any) {
   return array.sort((a: any, b: any) => {
@@ -163,6 +179,9 @@ export default function QChatListRequests({
     }
   }
 
+  const [showToolsModal, setShowToolsModal] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+
   return (
     <main>
       <Button className="m-4 text-xl" onClick={() => onNewFormRequest()}>
@@ -204,6 +223,141 @@ export default function QChatListRequests({
                 <TableCell className="font-medium">{item.customer}</TableCell>
                 <TableCell className="truncate sm:max-w-24 md:max-w-48">
                   {item.website}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowToolsModal(true)}
+                    className="ml-2"
+                  >
+                    + Add Tools
+                  </Button>
+                  <Dialog
+                    open={showToolsModal}
+                    onOpenChange={setShowToolsModal}
+                  >
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Add Tools</DialogTitle>
+                        <DialogDescription>
+                          Add additional tools to enhance your chatbot.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <LocalLabel className="text-right">
+                            Tool Type
+                          </LocalLabel>
+                          <Select
+                            onValueChange={(value) => setSelectedTool(value)}
+                          >
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue placeholder="Select a tool" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="document">
+                                Upload Document
+                              </SelectItem>
+                              <SelectItem value="website">
+                                Additional Website
+                              </SelectItem>
+                              <SelectItem value="api">
+                                API Integration
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {selectedTool === "document" && (
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <LocalLabel
+                              htmlFor="document"
+                              className="text-right"
+                            >
+                              Document
+                            </LocalLabel>
+                            <Input
+                              id="document"
+                              type="file"
+                              className="col-span-3"
+                            />
+                          </div>
+                        )}
+                        {selectedTool === "website" && (
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <LocalLabel
+                              htmlFor="website"
+                              className="text-right"
+                            >
+                              Website URL
+                            </LocalLabel>
+                            <Input
+                              id="website"
+                              placeholder="https://example.com"
+                              className="col-span-3"
+                            />
+                          </div>
+                        )}
+                        {selectedTool === "api" && (
+                          <>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <LocalLabel
+                                htmlFor="api-url"
+                                className="text-right"
+                              >
+                                API URL
+                              </LocalLabel>
+                              <Input
+                                id="api-url"
+                                placeholder="https://api.example.com"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <LocalLabel
+                                htmlFor="api-key"
+                                className="text-right"
+                              >
+                                API Key
+                              </LocalLabel>
+                              <Input
+                                id="api-key"
+                                type="password"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <LocalLabel
+                                htmlFor="api-params"
+                                className="text-right"
+                              >
+                                Parameters
+                              </LocalLabel>
+                              <Input
+                                id="api-params"
+                                placeholder="param1=value1&param2=value2"
+                                className="col-span-3"
+                              />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <LocalLabel
+                                htmlFor="api-description"
+                                className="text-right"
+                              >
+                                Description
+                              </LocalLabel>
+                              <Textarea
+                                id="api-description"
+                                placeholder="Describe the API..."
+                                className="col-span-3"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit">Add Tool</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </TableCell>
                 <TableCell>{item.requester_email}</TableCell>
                 <TableCell>
