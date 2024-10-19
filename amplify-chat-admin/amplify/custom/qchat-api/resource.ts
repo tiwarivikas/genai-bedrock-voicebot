@@ -548,7 +548,7 @@ export class QChatApi extends Construct {
 
     // Create a new secret in Secrets Manager with a simple secret key
     const secret = new secretsmanager.Secret(this, 'AppSecret', {
-      secretName: 'jwt-secret' + props.amplifyBackendType,
+      secretName: 'jwt-secret-' + props.amplifyBackendType + '-' + props.amplifyBackendNamespace,
       secretStringValue: cdk.SecretValue.unsafePlainText(_config.JWT_SECRET), // Replace with your actual secret value
     });
 
