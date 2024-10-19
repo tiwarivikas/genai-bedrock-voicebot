@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Skeleton from "@/app/ui/Skeleton";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
@@ -229,9 +229,8 @@ export default function QChatListRequests({
                     variant="outline"
                     size="sm"
                     onClick={() => setShowToolsModal(true)}
-                    className="ml-2"
                   >
-                    + Add Tools
+                    <PlusCircleIcon className="h-4 text-green-600" />
                   </Button>
                   <Dialog
                     open={showToolsModal}
