@@ -29,9 +29,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Label,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -39,6 +39,8 @@ import {
 } from "@radix-ui/react-select";
 import { Select } from "@/components/ui/select";
 import { Label as LocalLabel } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 function sortByCreationDate(array: any) {
   return array.sort((a: any, b: any) => {
@@ -354,7 +356,68 @@ export default function QChatListRequests({
                         )}
                       </div>
                       <DialogFooter>
-                        <Button type="submit">Add Tool</Button>
+                        <Button
+                          type="submit"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            const apiUrl = (
+                              document.getElementById(
+                                "api-url"
+                              ) as HTMLInputElement
+                            ).value;
+                            const apiKey = (
+                              document.getElementById(
+                                "api-key"
+                              ) as HTMLInputElement
+                            ).value;
+                            const apiParams = (
+                              document.getElementById(
+                                "api-params"
+                              ) as HTMLInputElement
+                            ).value;
+                            const apiDescription = (
+                              document.getElementById(
+                                "api-description"
+                              ) as HTMLTextAreaElement
+                            ).value;
+
+                            try {
+                              const { idToken } =
+                                (await fetchAuthSession()).tokens ?? {};
+                              const endpoint_url = (config as any).custom
+                                .apiExecuteStepFnEndpoint;
+
+                              const response = await fetch(
+                                `${endpoint_url}executeCommand`,
+                                {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: idToken?.toString() ?? "",
+                                  },
+                                  body: JSON.stringify({
+                                    url: apiUrl,
+                                    key: apiKey,
+                                    params: apiParams,
+                                    description: apiDescription,
+                                  }),
+                                }
+                              );
+
+                              if (response.ok) {
+                                // Close the dialog or show success message
+                                // You might want to update this part based on your UI structure
+                                console.log("Tool added successfully");
+                              } else {
+                                console.error("Failed to add tool");
+                              }
+                            } catch (error) {
+                              console.error("Error adding tool:", error);
+                            }
+                          }}
+                        >
+                          Add Tool
+                        </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
