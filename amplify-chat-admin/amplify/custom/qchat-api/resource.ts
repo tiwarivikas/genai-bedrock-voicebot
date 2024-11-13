@@ -614,6 +614,14 @@ export class QChatApi extends Construct {
                   name: "KENDRA_INDEXID",
                   value: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID
                 },
+                {
+                  name: "BHASHINI_USER_ID",
+                  value: _config.BHASHINI_USER_ID
+                },
+                {
+                  name: "BHASHINI_API_KEY", 
+                  value: _config.BHASHINI_API_KEY
+                }
               ]
             },
           },
