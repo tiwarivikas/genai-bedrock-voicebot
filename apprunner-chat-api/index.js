@@ -8,7 +8,7 @@ const { chat } = require("./components/chat-service");
 const { authenticateJWT } = require("./components/auth-service");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Use the cors middleware
 //app.use(cors());

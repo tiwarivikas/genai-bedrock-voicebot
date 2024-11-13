@@ -42,5 +42,5 @@ function Layout(
     </main>
   );
 }
-
+//export default Layout;
 export default withAuthenticator(Layout);

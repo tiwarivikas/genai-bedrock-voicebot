@@ -6,31 +6,6 @@ const {
 const { executeBedrockAPI } = require("./utils/bedrock-services");
 const { getPrompt } = require("./utils/prompts");
 const { executeTools } = require("./utils/execute-tools");
-//Define structure of context
-/* const context = {
-  query: "",
-  executionId: "",
-  appId: "",
-  conversationId: "",
-  resumeWorkflow: "",
-  availableTools: [],
-  previousState: {},
-}; */
-
-//Define structure of a tool
-const tool = {
-  name: "",
-  description: "",
-  InputParams: [
-    {
-      name: "",
-      type: "",
-      description: "",
-      required: "",
-      inputPrompt: "",
-    },
-  ],
-};
 
 async function executeWorkflow(userMsg, decodedToken, isSpeakerEnabled) {
   const {

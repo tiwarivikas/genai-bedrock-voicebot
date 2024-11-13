@@ -13,7 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowPathIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  GlobeAltIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Skeleton from "@/app/ui/Skeleton";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
@@ -41,6 +45,12 @@ import { Select } from "@/components/ui/select";
 import { Label as LocalLabel } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import AddTooltip from "@/app/ui/addTooltip";
 
 function sortByCreationDate(array: any) {
   return array.sort((a: any, b: any) => {
@@ -224,7 +234,12 @@ export default function QChatListRequests({
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.customer}</TableCell>
                 <TableCell className="truncate sm:max-w-24 md:max-w-48">
-                  {item.website}
+                  <AddTooltip title={item.website}>
+                    <span className="text-red-500">
+                      <GlobeAltIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
+                    </span>
+                  </AddTooltip>
+
                   <Button
                     variant="outline"
                     size="sm"

@@ -1,17 +1,3 @@
-const {
-  executeBedrockAPI,
-  executeBedrockStreamingAPI,
-} = require("./llm-service/bedrock-services");
-const { retrieveKendraSearch } = require("./rag-service/kendra-retrieval");
-const {
-  mutateConversation,
-  queryConversastion,
-} = require("./rag-service/conversation-services");
-const { llmPrompt, extractFirstJSON } = require("./llm-service/prompt-utils");
-const { responseStreaming } = require("./llm-service/response-streaming");
-const { textToSpeechStream } = require("./tts-service/tts-service");
-const { translateText } = require("./translation-service/translation-service");
-
 async function chat(
   userMsg,
   decodedToken,
@@ -27,9 +13,54 @@ async function chat(
   var conversationId = "";
 
   try {
-    const { userMessage: originalQuery, conversationId: convId } =
-      JSON.parse(userMsg);
+    const {
+      userMessage: originalQuery,
+      conversationId: convId,
+      useAgent,
+    } = JSON.parse(userMsg);
     conversationId = convId;
+
+    if (useAgent) {
+      // Execute workflow logic
+      const workflow = require("./agent-flow/workflow");
+      const workflowResponse = await workflow.executeWorkflow(
+        originalQuery,
+        decodedToken,
+        isSpeakerEnabled
+      );
+
+      var outputResponse = {
+        conversationId: conversationId,
+        failedAttachments: [],
+        sourceAttributions: [],
+        systemMessage: workflowResponse,
+        systemMessageId: "",
+        userMessageId: "",
+      };
+
+      res.write("data: [COMPLETE]\n\n");
+      const txtResponse = await translateText(
+        outputResponse.systemMessage,
+        "en",
+        translationLanguage
+      );
+      outputResponse.systemMessage = txtResponse;
+      res.write(`data: ${JSON.stringify(outputResponse)}\n\n`);
+
+      if (isSpeakerEnabled == "true") {
+        res.write("data: [AUDIO]\n\n");
+        await textToSpeechStream(
+          outputResponse.systemMessage,
+          res,
+          translationLanguage
+        );
+      } else {
+        res.write("data: [END]\n\n");
+        res.end();
+      }
+
+      return;
+    }
 
     const query = await translateText(originalQuery, translationLanguage, "en");
 
@@ -143,7 +174,6 @@ async function chat(
         systemMessageId: messageId,
         userMessageId: "",
       };
-      //return outputResponse;
     }
 
     res.write("data: [COMPLETE]\n\n");
@@ -156,15 +186,12 @@ async function chat(
     res.write(`data: ${JSON.stringify(outputResponse)}\n\n`);
 
     if (isSpeakerEnabled == "true") {
-      //Start TTS
       res.write("data: [AUDIO]\n\n");
       await textToSpeechStream(
         outputResponse.systemMessage,
         res,
         translationLanguage
       );
-      //res.write('data: [END]\n\n');
-      //res.end();
     } else {
       res.write("data: [END]\n\n");
       res.end();
@@ -186,7 +213,6 @@ async function chat(
     res.write("data: [END]\n\n");
     res.end();
     return;
-    //return "Exception: Assistant is not available. Please try after some time.";
   }
 }
 
