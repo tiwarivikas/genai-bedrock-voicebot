@@ -1,5 +1,4 @@
 ;(function () {
-  const baseUrl = "https://main.d153z7r4wirmkz.amplifyapp.com"
   const mountPointId = "qchat-chat-popup-container"
 
   function createAppMountPoint() {
@@ -37,6 +36,10 @@
   //const currentScript = scripts[scripts.length - 1]
   window.qchatQueryParams = getQueryParams(currentScript.src)
 
+  const baseUrl = new URL(currentScript.src).origin
+
+  console.log("baseUrl", baseUrl)
+
   // Disable zooming on text input on iPhones
   if (navigator.userAgent.indexOf("iPhone") > -1) {
     document
@@ -46,10 +49,10 @@
 
   createAppMountPoint()
 
-  loadCSS(`${baseUrl}/index.css`);
+  loadCSS(`${baseUrl}/index.css`)
   loadScript(`${baseUrl}/index.js`)
-          .then(() => {})
-          .catch((error) => {
-            console.error("Error loading React app script:", error)
-          })
+    .then(() => {})
+    .catch((error) => {
+      console.error("Error loading React app script:", error)
+    })
 })()
