@@ -627,8 +627,25 @@ export class QChatApi extends Construct {
                   value: kendraIndex? kendraIndex.attrId: _config.KENDRA_INDEXID
                 },
                 {
+<<<<<<< HEAD
                   name: "agentContextDDBTableName",
                   value: agentContextTable.tableName
+=======
+                  name: "BHASHINI_USER_ID",
+                  value: _config.BHASHINI_USER_ID
+                },
+                {
+                  name: "BHASHINI_API_KEY", 
+                  value: _config.BHASHINI_API_KEY
+                },
+                {
+                  name: "BEDROCK_REGION",
+                  value: _config.BEDROCK_REGION
+                },
+                {
+                  name: "BEDROCK_MODEL",
+                  value: _config.BEDROCK_MODEL
+>>>>>>> bd72a1be1227c632a36914c6bc6bfb4d71c55e44
                 }
               ]
             },

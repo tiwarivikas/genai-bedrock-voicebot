@@ -10,6 +10,10 @@ interface AppConfig {
     APPRUNNER_GITHUB_CONNECTION_ARN: string;
     CHAT_PROD_API: string;
     KENDRA_INDEXID: string;
+    BHASHINI_API_KEY: string;
+    BHASHINI_USER_ID: string;
+    BEDROCK_MODEL: string;
+    BEDROCK_REGION: string;
 }
 
 // Create a configuration object
@@ -21,6 +25,10 @@ const _config: AppConfig = {
     APPRUNNER_GITHUB_BRANCH_SANDBOX: process.env.APPRUNNER_GITHUB_BRANCH_SANDBOX || 'sandbox',
     CHAT_PROD_API: process.env.CHAT_PROD_API || 'UPDATE_ENVIRONMENT_VARIABLE_:_CHAT_PROD_API',
     KENDRA_INDEXID: process.env.KENDRA_INDEXID || '',
+    BHASHINI_API_KEY: process.env.BHASHINI_API_KEY || '',
+    BHASHINI_USER_ID: process.env.BHASHINI_USER_ID || '',
+    BEDROCK_MODEL: process.env.BEDROCK_MODEL || "mistral.mixtral-8x7b-instruct-v0:1",
+    BEDROCK_REGION: process.env.BEDROCK_REGION || '',
 };
 //test
 

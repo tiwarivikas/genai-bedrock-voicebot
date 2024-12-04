@@ -3,20 +3,26 @@ const { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamC
 async function executeBedrockAPI(query) {
     try {
 
-        const configBR = {};
+        var configBR = {};
+        if (process.env.BEDROCK_REGION) {
+          configBR = {
+            region: process.env.BEDROCK_REGION,
+          };
+        }
+
         const clientBR = new BedrockRuntimeClient(configBR);
         const inputBR = {
-            modelId: "mistral.mixtral-8x7b-instruct-v0:1", //"mistral.mistral-7b-instruct-v0:2",
-            contentType: "application/json",
-            accept: "application/json",
-            body: JSON.stringify({
-                prompt: query,
-                max_tokens: 2000,
-                temperature: 0.5,
-                top_k: 200,
-                top_p: 1,
-                stop: ["Human"]
-            }),
+          modelId: process.env.BEDROCK_MODEL, //"mistral.mistral-7b-instruct-v0:2",
+          contentType: "application/json",
+          accept: "application/json",
+          body: JSON.stringify({
+            prompt: query,
+            max_tokens: 2000,
+            temperature: 0.5,
+            top_k: 200,
+            top_p: 1,
+            stop: ["Human"],
+          }),
         };
         const commandBR = new InvokeModelCommand(inputBR);
         const response = await clientBR.send(commandBR);
@@ -35,19 +41,24 @@ async function executeBedrockStreamingAPI(query) {
     try {
 
         const configBR = {};
+        if (process.env.BEDROCK_REGION) {
+          configBR = {
+            region: process.env.BEDROCK_REGION,
+          };
+        }
         const clientBR = new BedrockRuntimeClient(configBR);
         const inputBR = {
-            modelId: "mistral.mixtral-8x7b-instruct-v0:1", //"mistral.mistral-7b-instruct-v0:2",
-            contentType: "application/json",
-            accept: "application/json",
-            body: JSON.stringify({
-                prompt: query,
-                max_tokens: 2000,
-                temperature: 0.5,
-                top_k: 200,
-                top_p: 1,
-                stop: ["Human"]
-            }),
+          modelId: process.env.BEDROCK_MODEL, //"mistral.mistral-7b-instruct-v0:2",
+          contentType: "application/json",
+          accept: "application/json",
+          body: JSON.stringify({
+            prompt: query,
+            max_tokens: 2000,
+            temperature: 0.5,
+            top_k: 200,
+            top_p: 1,
+            stop: ["Human"],
+          }),
         };
 
         const command = new InvokeModelWithResponseStreamCommand(inputBR);

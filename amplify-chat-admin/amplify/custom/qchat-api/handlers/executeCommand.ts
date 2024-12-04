@@ -54,7 +54,7 @@ export const handler = async function (
 
         //Write to URL Shortener
         let urlShortenerResult = ""
-        const redirectURL = process.env.CHAT_PROD_API + token
+        const redirectURL = process.env.CHAT_PROD_API + "?bedrockEngine=true&token=" + token
         if (content.applicationIdQ) {
           urlShortenerResult = await urlShortenerDDB(content.applicationIdQ, redirectURL)
         }

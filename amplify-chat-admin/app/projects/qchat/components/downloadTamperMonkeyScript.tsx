@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Tooltip,
   TooltipContent,
@@ -8,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-export default async function DownloadTamperMonekyScript({
+// Remove async from the component definition
+export default function DownloadTamperMonkeyScript({
   domainName,
   chatbotURL,
   customerName,
@@ -40,11 +43,10 @@ export default async function DownloadTamperMonekyScript({
     })();`;
 
   const downloadScript = async () => {
-    const urlWithToken = (await getRedirectUrl(chatbotURL)) || "";
+    const urlWithToken = await getRedirectUrl(chatbotURL);
 
-    if (urlWithToken == "") return null;
+    if (!urlWithToken) return;
 
-    //Replace string ##URL## with urlWithToken in scriptContent
     const scriptContentWithToken = scriptContent.replace(
       "##URL##",
       urlWithToken
@@ -53,12 +55,12 @@ export default async function DownloadTamperMonekyScript({
       type: "text/javascript",
     });
     const url = URL.createObjectURL(blob);
-    //return url;
     const a = document.createElement("a");
     a.href = url;
     a.download = `qchat-script-${customerName}.user.js`;
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a); // Clean up the DOM
     URL.revokeObjectURL(url);
   };
 
@@ -77,14 +79,14 @@ export default async function DownloadTamperMonekyScript({
     </TooltipProvider>
   );
 }
-async function getRedirectUrl(url) {
+
+// Keep these helper functions outside the component
+async function getRedirectUrl(url: string) {
   try {
     const response = await fetch(url + "&redirectUrl=true", {
       method: "GET",
     });
-
     const data = await response.json();
-
     return formatURL(data.redirectUrl);
   } catch (error) {
     console.error("Error:", error);
@@ -92,9 +94,7 @@ async function getRedirectUrl(url) {
   }
 }
 
-function formatURL(url) {
-  //Retrieve the URL hostname, queryparams and add serve.js as path before '?'
+function formatURL(url: string) {
   const parsedUrl = new URL(url);
-  const formattedUrl = `${parsedUrl.origin}${parsedUrl.pathname}serve.js${parsedUrl.search}`;
-  return formattedUrl;
+  return `${parsedUrl.origin}${parsedUrl.pathname}serve.js${parsedUrl.search}`;
 }
