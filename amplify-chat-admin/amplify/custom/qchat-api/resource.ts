@@ -621,6 +621,14 @@ export class QChatApi extends Construct {
                 {
                   name: "BHASHINI_API_KEY", 
                   value: _config.BHASHINI_API_KEY
+                },
+                {
+                  name: "BEDROCK_REGION",
+                  value: _config.BEDROCK_REGION
+                },
+                {
+                  name: "BEDROCK_MODEL",
+                  value: _config.BEDROCK_MODEL
                 }
               ]
             },
