@@ -591,7 +591,7 @@ export class QChatApi extends Construct {
           codeConfiguration: {
             configurationSource: 'API',
             codeConfigurationValues: {
-              runtime: 'NODEJS_14',
+              runtime: 'NODEJS_18',
               buildCommand: 'npm install',
               startCommand: 'npm start',
               port: '8080',
