@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { generateClient } from "aws-amplify/data";
 import { Schema } from "@/amplify/data/resource";
 import { useUser } from "../../UserContext";
@@ -10,7 +8,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -22,7 +19,6 @@ import {
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Skeleton from "@/app/ui/Skeleton";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import DownloadTamperMonekyScript from "./downloadTamperMonkeyScript";
@@ -30,24 +26,6 @@ import StatusUpdate from "./statusUpdate";
 import config from "@/amplify_outputs.json";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@radix-ui/react-select";
-import { Select } from "@/components/ui/select";
-import { Label as LocalLabel } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import AddTooltip from "@/app/ui/addTooltip";
 
 function sortByCreationDate(array: any) {
@@ -188,9 +166,6 @@ export default function QChatListRequests({
       console.log(err);
     }
   }
-
-  const [showToolsModal, setShowToolsModal] = useState(false);
-  const [selectedTool, setSelectedTool] = useState<string | null>(null);
 
   return (
     <main>
