@@ -1,6 +1,7 @@
 import { generateClient } from "aws-amplify/data";
 import { Schema } from "@/amplify/data/resource";
 import { useUser } from "../../UserContext";
+import { SocialIcon } from "react-social-icons";
 
 import {
   Table,
@@ -13,7 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  ChatBubbleLeftRightIcon,
+  GlobeAltIcon,
+} from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Skeleton from "@/app/ui/Skeleton";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
@@ -23,6 +28,25 @@ import StatusUpdate from "./statusUpdate";
 import config from "@/amplify_outputs.json";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import { Select } from "@/components/ui/select";
+import { Label as LocalLabel } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import AddTooltip from "@/app/ui/addTooltip";
 
 function sortByCreationDate(array: any) {
   return array.sort((a: any, b: any) => {
@@ -163,6 +187,9 @@ export default function QChatListRequests({
     }
   }
 
+  const [showToolsModal, setShowToolsModal] = useState(false);
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+
   return (
     <main>
       <Button className="m-4 text-xl" onClick={() => onNewFormRequest()}>
@@ -182,7 +209,7 @@ export default function QChatListRequests({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[200px]">Customer Name</TableHead>
-              <TableHead className="w-[200px]">Website URL</TableHead>
+              <TableHead className="w-[100px]">Knowledgebase</TableHead>
               <TableHead>Requested By</TableHead>
               <TableHead>Creation Date</TableHead>
               <TableHead className="w-[300px]">
@@ -203,7 +230,11 @@ export default function QChatListRequests({
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.customer}</TableCell>
                 <TableCell className="truncate sm:max-w-24 md:max-w-48">
-                  {item.website}
+                  <AddTooltip title={item.website}>
+                    <Link href={item.website} target="_blank">
+                      <GlobeAltIcon className="w-6 inline-flex" />
+                    </Link>
+                  </AddTooltip>
                 </TableCell>
                 <TableCell>{item.requester_email}</TableCell>
                 <TableCell>
@@ -215,14 +246,28 @@ export default function QChatListRequests({
                 <TableCell>
                   {item.token ? (
                     <>
-                      <Link
-                        href={item.token.includes("?id=") ? item.token : ""}
-                        target="_blank"
-                        className="text-blue-500 underline hover:text-purple-500"
+                      <AddTooltip
+                        title={`${item.chatbotname} => Web ChatBot and VoiceBot`}
                       >
-                        {item.chatbotname}
-                        <ArrowTopRightOnSquareIcon className="h-4 pl-2 inline-flex" />
-                      </Link>
+                        <Link
+                          href={item.token.includes("?id=") ? item.token : ""}
+                          target="_blank"
+                        >
+                          <ChatBubbleLeftRightIcon className="w-6 inline-flex" />
+                        </Link>
+                      </AddTooltip>
+                      <AddTooltip title={`${item.chatbotname} => Whatsapp Bot`}>
+                        <Link
+                          href={`https://wa.me/9289104565?text=${item.applicationIdQ}`}
+                          target="_blank"
+                        >
+                          <SocialIcon
+                            network="whatsapp"
+                            className="w-6 h-6 inline-flex"
+                            style={{ width: "24px" }}
+                          />
+                        </Link>
+                      </AddTooltip>
                       <DownloadTamperMonekyScript
                         domainName={new URL(item.website).hostname}
                         chatbotURL={item.token}
