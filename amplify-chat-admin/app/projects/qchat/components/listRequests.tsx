@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { generateClient } from "aws-amplify/data";
 import { Schema } from "@/amplify/data/resource";
 import { useUser } from "../../UserContext";
