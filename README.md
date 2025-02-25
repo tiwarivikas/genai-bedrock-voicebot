@@ -69,6 +69,7 @@ In the **Advanced settings** section, add the following environment variables:
 - `CHAT_PROD_API=""` (Leave this blank initially)
 - `BHASHINI_USER_ID="<User ID of Bhashini>"` (Optional)
 - `BHASHINI_API_KEY="<API Key of Bhashini>"` (Optional)
+- `KENDRA_INDEXID=""` (Optional. If specified, project will use existing Kendra instead creating a new one)
 
 ### Modify Project Name (Admin Console)
 
