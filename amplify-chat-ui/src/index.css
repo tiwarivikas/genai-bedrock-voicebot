@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply text-blue-700;
+    @apply underline;
+  }
+}
+
+#qchat-chat-popup-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+}
+
+.qchat-small-btn {
+  position: relative;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+}
+
+.qchat-small-btn:disabled {
+  cursor: not-allowed;
+}
+
+.qchat-tooltip {
+  background-color: #000;
+  color: white;
+  font-size: 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  padding: 6px 9px;
+  opacity: 0;
+  display: block;
+  position: absolute;
+  white-space: nowrap;
+  transition: 0.1s;
+}
+
+button:hover:enabled .qchat-tooltip {
+  opacity: 1;
+}
+
+code {
+  text-wrap: wrap;
+}
